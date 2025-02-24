@@ -1,0 +1,22 @@
+{
+  "name": "CM Store",
+  "short_name": "CM Store",
+  "description": "Uma loja de jogos incrível para baixar e curtir!",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#004F5F",
+  "theme_color": "#003C4C",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/jHLkzEi.jpeg",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
