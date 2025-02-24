@@ -3,23 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>cm store</title>
+  <title>CM Store - Em Breve</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "a4f0c78a-3931-4258-998a-9a79e9a5e314",
-      safari_web_id: "web.onesignal.auto.2473987d-7114-4e84-8494-f768208d432f",
-      notifyButton: {
-        enable: true,
-      },
-    });
-  });
-</script>
-  <script src="alert.js"></script>
+
   <style>
     /* Reset e estilos base */
     * {
@@ -32,255 +18,58 @@
       font-family: 'Roboto', sans-serif;
       background-color: #004F5F;
       color: #FFFFFF;
-    }
-
-    /* Barra de navegação */
-    .navbar {
-      background-color: #003C4C;
-      padding: 15px 20px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-    }
-
-    .navbar h1 {
-      font-size: 1.5em;
-    }
-
-    .menu {
-      display: flex;
-      gap: 20px;
-    }
-
-    .menu a {
-      text-decoration: none;
-      color: #FFFFFF;
-      font-weight: 500;
-    }
-
-    /* Menu hambúrguer */
-    .hamburger {
-      display: none;
-      font-size: 2em;
-      cursor: pointer;
-    }
-
-    .mobile-menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 0;
-      width: 200px;
-      background-color: #003C4C;
-      box-shadow: -2px 2px 10px rgba(0,0,0,0.3);
       flex-direction: column;
-    }
-
-    .mobile-menu a {
-      padding: 10px;
-      text-decoration: none;
-      color: #FFFFFF;
-      display: block;
-      border-bottom: 1px solid #004F5F;
-    }
-
-    /* Layout do conteúdo */
-    .container {
-      max-width: 1200px;
-      margin: 80px auto 20px;
-      padding: 20px;
-    }
-
-    .games-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
+      align-items: center;
       justify-content: center;
-    }
-
-    .game-card {
-      background-color: #006373;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      width: 300px;
-      padding: 20px;
+      height: 100vh;
       text-align: center;
-      transition: transform 0.3s;
     }
 
-    .game-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .game-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 15px;
-      border: 2px solid #FFFFFF;
-    }
-
-    .game-title {
-      font-size: 1.4em;
-      font-weight: 700;
+    h1 {
+      font-size: 2em;
       margin-bottom: 10px;
     }
 
-    .game-description {
-      font-size: 1em;
-      margin-bottom: 20px;
-      color: #f0f0f0;
+    p {
+      font-size: 1.2em;
+      color: #FFD700;
     }
 
-    .actions {
-      display: flex;
-      justify-content: space-around;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s;
-      color: #FFFFFF;
-    }
-
-    .btn-download {
-      background-color: #FFA000;
-    }
-
-    .btn-download:hover {
-      background-color: #FF8F00;
-    }
-
-    .btn-like {
-      background-color: #FF5252;
-    }
-
-    .btn-like:hover {
-      background-color: #FF1744;
-    }
-
-    /* Botão flutuante */
-    .fab {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 56px;
-      height: 56px;
-      background-color: #FFA000;
-      border: none;
+    .loader {
+      border: 6px solid rgba(255, 255, 255, 0.2);
+      border-top: 6px solid #FFA000;
       border-radius: 50%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      color: #FFFFFF;
-      font-size: 2em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
     }
 
-    .fab:hover {
-      background-color: #FF8F00;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    /* Rodapé */
     footer {
-      background-color: #003C4C;
-      text-align: center;
-      padding: 15px;
-      margin-top: 30px;
-    }
-
-    footer p {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.9em;
       color: #FFFFFF;
-    }
-
-    /* Responsividade */
-    @media (max-width: 768px) {
-      .menu {
-        display: none;
-      }
-      .hamburger {
-        display: block;
-      }
-      .mobile-menu.active {
-        display: flex;
-      }
-      .games-grid {
-        flex-direction: column;
-        align-items: center;
-      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Navbar com menu hambúrguer -->
-  <nav class="navbar" onclick="notifica()">
-    <h1>CM Store</h1>
-    <div class="menu">
-      <a href="#">Início</a>
-      <a href="#">Jogos</a>
-      <a href="#">Contato</a>
-    </div>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
-  </nav>
+  <h1>CM Store</h1>
+  <p>Estamos trabalhando para trazer algo incrível para você!</p>
+  <p>Fique ligado, em breve novidades.</p>
 
-  <!-- Menu mobile -->
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="#">Início</a>
-    <a href="#">Jogos</a>
-    <a href="#">Contato</a>
-  </div>
+  <div class="loader"></div>
 
-  <!-- Conteúdo principal -->
-  <div class="container">
-    <section class="games-grid">
-      <div class="game-card">
-        <img src="https://via.placeholder.com/80" alt="Ícone do Jogo" class="game-icon">
-        <h2 class="game-title">Jogo 1</h2>
-        <p class="game-description">Uma breve descrição do jogo para atrair a atenção do usuário.</p>
-        <div class="actions">
-          <button class="btn btn-download">Baixar</button>
-          <button class="btn btn-like">Curtir</button>
-        </div>
-      </div>
-
-      <div class="game-card">
-        <img src="https://via.placeholder.com/80" alt="Ícone do Jogo" class="game-icon">
-        <h2 class="game-title">Jogo 2</h2>
-        <p class="game-description">Descrição interessante que destaca os diferenciais do jogo.</p>
-        <div class="actions">
-          <button class="btn btn-download">Baixar</button>
-          <button class="btn btn-like">Curtir</button>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Botão Flutuante -->
-  <button class="fab">+</button>
-
-  <!-- Rodapé -->
   <footer>
     <p>Dev: Caio Multiversando</p>
   </footer>
 
-  <!-- Script para o menu hambúrguer -->
-  <script src="menu.js">
-    
-  </script>
-
-<script src="main.js">main.js</script>
-<script src="notificar.js"></script>
 </body>
 </html>
