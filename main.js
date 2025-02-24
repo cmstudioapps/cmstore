@@ -3,7 +3,7 @@ function toggleFullScreen() {
         document.documentElement.requestFullscreen().catch(err => {
             console.error(`Erro ao tentar entrar em tela cheia: ${err.message}`);
         });
-    } else {
-        document.exitFullscreen();
     }
+        
+    
 }
