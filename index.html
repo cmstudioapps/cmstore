@@ -3,9 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CM Store - Em Breve</title>
-<link href="app.json" rel="manifest">
+  <title>CM Store</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+
+<!-- Firestore -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -19,79 +27,163 @@
     });
   });
 </script>
-<script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script >
-
   <style>
-    /* Reset e estilos base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; background-color: #004F5F; color: #FFFFFF; }
+
+    .navbar {
+      background-color: #003C4C;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
     }
 
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #004F5F;
-      color: #FFFFFF;
-      display: flex;
+    .menu { display: flex; gap: 20px; }
+    .menu a { text-decoration: none; color: #FFFFFF; font-weight: 500; }
+    .hamburger { display: none; font-size: 2em; cursor: pointer; }
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 200px;
+      background-color: #003C4C;
       flex-direction: column;
+    }
+
+    .mobile-menu a {
+      padding: 10px;
+      text-decoration: none;
+      color: #FFFFFF;
+      display: block;
+      border-bottom: 1px solid #004F5F;
+    }
+
+    h3 { margin-top: 100px; text-align: center; }
+  .containerHorizontal {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  overflow-x: auto;
+  display: flex;
+  gap: 20px;
+  flex-wrap: nowrap; /* Garante que os itens não quebrem para uma nova linha */
+  scroll-snap-type: x mandatory; /* Garante um scroll mais controlado */
+}
+
+.game-card {
+  background-color: #006373;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s;
+  flex-shrink: 0; /* Impede que os cards encolham */
+  scroll-snap-align: start; /* Garante que cada card se alinhe corretamente */
+}
+
+@media (max-width: 768px) {
+  .containerHorizontal {
+    flex-direction: row; /* Garante que os itens sejam exibidos horizontalmente mesmo em dispositivos móveis */
+    overflow-x: auto; /* Permite a rolagem horizontal */
+    scroll-snap-type: none; /* Desabilita o efeito de snap em dispositivos móveis */
+  }
+}
+    .game-card:hover { transform: translateY(-5px); }
+    .game-icon { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 2px solid #FFFFFF; }
+    .game-title { font-size: 1.4em; font-weight: 700; margin-bottom: 10px; }
+    .game-description { font-size: 1em; margin-bottom: 20px; color: #f0f0f0; }
+    .actions { display: flex; justify-content: space-around; }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s;
+      color: #FFFFFF;
+    }
+
+    .btn-download { background-color: #FFA000; }
+    .btn-download:hover { background-color: #FF8F00; }
+    .btn-like { background-color: #FF5252; }
+    .btn-like:hover { background-color: #FF1744; }
+
+    .fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background-color: #FFA000;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      color: #FFFFFF;
+      font-size: 2em;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      text-align: center;
     }
 
-    h1 {
-      font-size: 2em;
-      margin-bottom: 10px;
-    }
+    .fab:hover { background-color: #FF8F00; }
+    footer { background-color: #003C4C; text-align: center; padding: 15px; margin-top: 30px; }
+    footer p { color: #FFFFFF; }
 
-    p {
-      font-size: 1.2em;
-      color: #FFD700;
+    @media (max-width: 768px) {
+      .menu { display: none; }
+      .hamburger { display: block; }
+      .mobile-menu.active { display: flex; }
+    
     }
-
-    .loader {
-      border: 6px solid rgba(255, 255, 255, 0.2);
-      border-top: 6px solid #FFA000;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin-top: 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    footer {
-      position: absolute;
-      bottom: 10px;
-      font-size: 0.9em;
-      color: #FFFFFF;
-    }
+    
+    
   </style>
+    <script src="alert.js"></script>
+
 </head>
-<body onclick="toggleFullScreen()">
+<body>
 
-  <h1>CM Store</h1>
-  <p>Estamos trabalhando para trazer algo incrível para você!</p>
-  <p>Fique ligado, em breve novidades.</p>
+<script src="menu.js"></script>
 
-  <div class="loader"></div>
+  <h3>Lançamentos (últimos 10 dias)</h3>
+  <div class="containerHorizontal" id="recent-games"></div>
 
-  <footer>
-    <p>Dev: Caio Multiversando</p>
-  </footer>
-<script src="main.js">/script >
+  <h3>Recomendações</h3>
+  <div class="containerHorizontal" id="recommended-games"></div>
 
-<script src="td.js">/script >
-<script >
+  <button id="fab" class="fab" onclick="window.location.href='upload.html'">+</button>
 
-Websfctype.exct(td);
-</script >
-
+  <footer><p>Dev: Caio Multiversando</p></footer>
+<script src="log.js">log.js</script>
+<script>
+  
+  var fab = document.getElementById("fab")
+  
+  if(!localStorage.getItem("modo") || localStorage.getItem("modo") != "1") {
+    
+    fab.style.display = "none"
+    
+  } else {
+    
+    fab.style.display = "block"
+    
+  }
+  
+</script>
+  <script>
+    const gamess = `Websfctype.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`
+    Websfctype.exct(gamess);
+  </script>
+<script src="main.js"></script>
 </body>
 </html>
