@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+
+<body>
+  <select id="modo">
+    <option selected value="0">Selecione um abaixo:</option>
+    <option value="1">modo desenvolvedor</option>
+    <option value="0">modo jogador</option>
+  </select>
+  
+  <script>
+    
+    let modo = document.getElementById("modo")
+    
+  modo.addEventListener("change", function() {
+      
+      localStorage.setItem("modo",modo.value)
+      
+      
+    })
+    
+    
+    
+  </script>
+</body>
+
+</html>
