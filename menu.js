@@ -15,6 +15,7 @@ menu.classList.add("menu");
 const links = [
   { text: "Início", href: "inicio.html" },
   { text: "Configuração", href: "config.html" },
+{ text: "Evento", href: "evento.html"},
   { text: "Contato", href: "https://www.instagram.com/caiomultiversando?igsh=MWFpcmYzZDB3YTNzZQ==" },
 ];
 
