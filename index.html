@@ -169,7 +169,7 @@
   
   var fab = document.getElementById("fab")
   
-  if(!localStorage.getItem("modo") || localStorage.getItem("modo") != "1") {
+  if(!localStorage.getItem("modo") || localStorage.getItem("modo") != "1" || !localStorage.getItem("nome")) {
     
     fab.style.display = "none"
     
