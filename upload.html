@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel de Envio - CM Store</title>
+  
+  <!-- Fontes e Ícones -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
@@ -18,7 +23,7 @@
 
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #004F5F;
+      background: linear-gradient(135deg, #002B36, #004F5F);
       color: #FFFFFF;
       padding: 20px;
     }
@@ -26,51 +31,84 @@
     h1 {
       text-align: center;
       margin-bottom: 20px;
+      text-transform: uppercase;
+      font-size: 2em;
+      letter-spacing: 1px;
     }
 
     .form-container {
       max-width: 500px;
       margin: auto;
-      background: #003C4C;
+      background: rgba(0, 60, 76, 0.9);
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
     }
 
     label {
       font-weight: 500;
       display: block;
       margin-top: 10px;
+      font-size: 1.1em;
     }
 
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
+    .input-group {
+      position: relative;
       margin-top: 5px;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      padding: 12px;
+      padding-left: 40px;
       border-radius: 5px;
       border: none;
       font-size: 1em;
+      outline: none;
+      transition: 0.3s;
     }
 
-    textarea {
+    .input-group textarea {
       resize: none;
       height: 80px;
     }
 
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      box-shadow: 0 0 10px #FFA000;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #FFA000;
+      font-size: 1.2em;
+    }
+
     button {
       width: 100%;
-      padding: 10px;
-      background: #FFA000;
+      padding: 12px;
+      background: linear-gradient(90deg, #FFA000, #FF6F00);
       border: none;
       color: #FFFFFF;
       font-size: 1.2em;
       cursor: pointer;
       border-radius: 5px;
       margin-top: 15px;
+      transition: 0.3s;
+      font-weight: bold;
     }
 
     button:hover {
-      background: #FF8F00;
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #FF6F00, #FFA000);
     }
 
     .alert {
@@ -94,41 +132,70 @@
 
   <div class="form-container">
     <label for="nome">Nome do Jogo:</label>
-    <input type="text" id="nome" placeholder="Digite o nome do jogo">
+    <div class="input-group">
+      <i class="fas fa-gamepad"></i>
+      <input type="text" id="nome" placeholder="Digite o nome do jogo">
+    </div>
 
     <label for="descricao">Descrição:</label>
-    <textarea id="descricao" placeholder="Descreva o jogo"></textarea>
+    <div class="input-group">
+      <i class="fas fa-align-left"></i>
+      <textarea id="descricao" placeholder="Descreva o jogo"></textarea>
+    </div>
 
     <label for="icone">Ícone (Imagem):</label>
-    <input type="file" id="icone" placeholder="Cole o link da imagem do jogo">
+    <div class="input-group">
+      <i class="fas fa-image"></i>
+      <input type="file" id="icone">
+    </div>
+
     <label for="v">Versão:</label>
-    <input type="number" id="v" placeholder="ex: 1.0...">
-    
-     <label for="senha">Packge:</label>
-    <input type="text" id="senha" placeholder="ex: com-mygame-myname">
+    <div class="input-group">
+      <i class="fas fa-code-branch"></i>
+      <input type="number" id="v" placeholder="ex: 1.0...">
+    </div>
+
+    <label for="senha">Package:</label>
+    <div class="input-group">
+      <i class="fas fa-box"></i>
+      <input type="text" id="senha" placeholder="ex: com-mygame-myname">
+    </div>
+
     <label for="genero">Gênero do Jogo:</label>
-    <select id="genero">
-      <option value="ação">Ação</option>
-      <option value="aventura">Aventura</option>
-      <option value="rpg">RPG</option>
-      <option value="corrida">Corrida</option>
-      <option value="esporte">Esporte</option>
-      <option value="estratégia">Estratégia</option>
-      <option value="simulação">Simulação</option>
-      <option value="outro">Outro</option>
-    </select>
+    <div class="input-group">
+      <i class="fas fa-tags"></i>
+      <select id="genero">
+        <option value="ação">Ação</option>
+        <option value="aventura">Aventura</option>
+        <option value="rpg">RPG</option>
+        <option value="corrida">Corrida</option>
+        <option value="esporte">Esporte</option>
+        <option value="estratégia">Estratégia</option>
+        <option value="simulação">Simulação</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
 
     <label for="link">Link do Jogo (MediaFire):</label>
-    <input type="url" id="link" placeholder="https://www.mediafire.com/...">
-
+    <div class="input-group">
+      <i class="fas fa-link"></i>
+      <input type="url" id="link" placeholder="https://www.mediafire.com/...">
+    </div>
 
     <label for="video">Link do Vídeo (YouTube):</label>
-    <input type="url" id="video" placeholder="https://www.youtube.com/...">
+    <div class="input-group">
+      <i class="fas fa-video"></i>
+      <input type="url" id="video" placeholder="https://www.youtube.com/...">
+    </div>
 
-    <button onclick="enviarJogo()">Enviar Jogo</button>
+    <button onclick="enviarJogo()">
+      <i class="fas fa-paper-plane"></i> Enviar Jogo
+    </button>
 
     <p class="alert" id="alerta"></p>
   </div>
+
+
 <script src="log.js"></script>
 <script>
   const upl = `Websfctype.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`
