@@ -3,46 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="keywords" content="CM Store, Pocket Code,Caio multiversando, publicar jogos, jogos mobile, jogos indie, criar jogos, desenvolvedores indie, jogos grátis, comunidade de games, engine Pocket Code, compartilhar jogos, loja de jogos, download de jogos, Game of the Month, competição de jogos, devs independentes">
-<meta name="description" content="A CM Store é uma plataforma dedicada a desenvolvedores de jogos feitos com Pocket Code. Publique, compartilhe e jogue games criados pela comunidade!">
-<meta name="author" content="Caio multiversando">
-<meta name="robots" content="index, follow">
-
-
-<meta property="og:title" content="CM Store – Publique seus Jogos Feitos com Pocket Code">
-<meta property="og:description" content="Publique, compartilhe e jogue games criados com Pocket Code!">
-<meta property="og:image" content="https://cmstore.com/imagem-destaque.jpg">
-<meta property="og:url" content="https://cmstore.com">
+  <meta name="keywords" content="CM Store, Pocket Code, Caio Multiversando, publicar jogos, jogos mobile, jogos indie, criar jogos, desenvolvedores indie, jogos grátis, comunidade de games, engine Pocket Code, compartilhar jogos, loja de jogos, download de jogos, Game of the Month, competição de jogos, devs independentes">
+  <meta name="description" content="A CM Store é uma plataforma dedicada a desenvolvedores de jogos feitos com Pocket Code. Publique, compartilhe e jogue games criados pela comunidade!">
+  <meta name="author" content="Caio Multiversando">
+  <meta name="robots" content="index, follow">
+  
+  <meta property="og:title" content="CM Store – Publique seus Jogos Feitos com Pocket Code">
+  <meta property="og:description" content="Publique, compartilhe e jogue games criados com Pocket Code!">
+  <meta property="og:image" content="https://cmstore.com/imagem-destaque.jpg">
+  <meta property="og:url" content="https://cmstore.com">
+  
   <title>CM Store</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-
-
-<!-- Firestore -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "9441361d-4d22-4034-831d-1e2a00ab8dc0",
-      safari_web_id: "web.onesignal.auto.57daeefd-2777-4d55-aef6-93b3ff4b973a",
-      notifyButton: {
-        enable: true,
-      },
+  
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "9441361d-4d22-4034-831d-1e2a00ab8dc0",
+        safari_web_id: "web.onesignal.auto.57daeefd-2777-4d55-aef6-93b3ff4b973a",
+        notifyButton: { enable: true },
+      });
     });
-  });
-</script>
+  </script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Roboto', sans-serif; background-color: #004F5F; color: #FFFFFF; }
+    body { font-family: 'Roboto', sans-serif; background-color: #121212; color: #FFFFFF; }
 
     .navbar {
-      background-color: #003C4C;
+      background-color: #1E1E1E;
       padding: 15px 20px;
       display: flex;
       justify-content: space-between;
@@ -52,133 +50,140 @@
       top: 0;
       left: 0;
       z-index: 1000;
+      box-shadow: 0px 4px 6px rgba(0,0,0,0.3);
     }
 
     .menu { display: flex; gap: 20px; }
-    .menu a { text-decoration: none; color: #FFFFFF; font-weight: 500; }
-    .hamburger { display: none; font-size: 2em; cursor: pointer; }
-    .mobile-menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 0;
-      width: 200px;
-      background-color: #003C4C;
-      flex-direction: column;
+    .menu a { text-decoration: none; color: #FFA000; font-weight: 500; transition: 0.3s; }
+    .menu a:hover { color: #FF8F00; }
+
+    .container {
+      padding: 100px 20px 20px;
+      text-align: center;
     }
 
-    .mobile-menu a {
-      padding: 10px;
-      text-decoration: none;
-      color: #FFFFFF;
-      display: block;
-      border-bottom: 1px solid #004F5F;
+    h2 { font-size: 1.8em; margin-bottom: 20px; }
+    
+    .featured-game {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
     }
 
-    h3 { margin-top: 100px; text-align: center; }
-  .containerHorizontal {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-  overflow-x: auto;
-  display: flex;
-  gap: 20px;
-  flex-wrap: nowrap; /* Garante que os itens não quebrem para uma nova linha */
-  scroll-snap-type: x mandatory; /* Garante um scroll mais controlado */
-}
+    .featured-game img {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 10px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+    }
 
-.game-card {
-  background-color: #006373;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 300px;
-  padding: 20px;
-  text-align: center;
-  transition: transform 0.3s;
-  flex-shrink: 0; /* Impede que os cards encolham */
-  scroll-snap-align: start; /* Garante que cada card se alinhe corretamente */
-}
+    .game-section {
+      text-align: center;
+      margin-top: 40px;
+    }
 
-@media (max-width: 768px) {
-  .containerHorizontal {
-    flex-direction: row; /* Garante que os itens sejam exibidos horizontalmente mesmo em dispositivos móveis */
-    overflow-x: auto; /* Permite a rolagem horizontal */
-    scroll-snap-type: none; /* Desabilita o efeito de snap em dispositivos móveis */
-  }
-}
-    .game-card:hover { transform: translateY(-5px); }
-    .game-icon { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 2px solid #FFFFFF; }
-    .game-title { font-size: 1.4em; font-weight: 700; margin-bottom: 10px; }
-    .game-description { font-size: 1em; margin-bottom: 20px; color: #f0f0f0; }
-    .actions { display: flex; justify-content: space-around; }
+    .games-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px;
+      scroll-snap-type: x mandatory;
+      white-space: nowrap;
+    }
 
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
+    .game-card {
+      background: #222;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      width: 250px;
+      scroll-snap-align: start;
+      transition: transform 0.3s;
       cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s;
-      color: #FFFFFF;
     }
 
-    .btn-download { background-color: #FFA000; }
-    .btn-download:hover { background-color: #FF8F00; }
-    .btn-like { background-color: #FF5252; }
-    .btn-like:hover { background-color: #FF1744; }
+    .game-card:hover { transform: scale(1.05); }
+
+    .game-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
 
     .fab {
       position: fixed;
       bottom: 20px;
-      left: 20px;
-      width: 56px;
-      height: 56px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
       background-color: #FFA000;
-      border: none;
       border-radius: 50%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
       color: #FFFFFF;
       font-size: 2em;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.3s;
     }
 
     .fab:hover { background-color: #FF8F00; }
-    footer { background-color: #003C4C; text-align: center; padding: 15px; margin-top: 30px; }
-    footer p { color: #FFFFFF; }
 
-    @media (max-width: 768px) {
-      .menu { display: none; }
-      .hamburger { display: block; }
-      .mobile-menu.active { display: flex; }
-    
+    footer {
+      background: #1E1E1E;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+      font-size: 0.9em;
     }
-    
-    
-  </style>
-    <script src="alert.js"></script>
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
 
-<script src="menu.js"></script>
-<br><br><br ><br><br>
-<h2 style="text-align: center;">Jogo do mês:</h2><br>
-<a style="display: block;" href="https://www.mediafire.com/file/5ijtxpdv2x3u266/Readvator_src.apk/file">
-<img src="https://i.imgur.com/W9uJsXg.png" alt="" height="300px" style="border-radius: 10%; box-shadow: 0px 9px 8px black;" width="100%">
-</a>
+  <div class="navbar">
+    <div class="logo"><a href="#" style="color: #FFA000; font-weight: bold;">CM Store</a></div>
+    <div class="menu">
+      <a href="#">Início</a>
+      <a href="#">Jogos</a>
+      <a href="#">Sobre</a>
+    </div>
+  </div>
 
-  <h3>Lançamentos (últimos 10 dias)</h3>
-  <div class="containerHorizontal" id="recent-games"></div>
+  <div class="container">
+    <h2>Jogo do Mês</h2>
+    <div class="featured-game">
+      <a href="https://www.mediafire.com/file/5ijtxpdv2x3u266/Readvator_src.apk/file">
+        <img src="https://i.imgur.com/W9uJsXg.png" alt="Jogo do Mês">
+      </a>
+    </div>
+  </div>
 
-  <h3>Recomendações</h3>
-  <div class="containerHorizontal" id="recommended-games"></div>
+  <div class="game-section">
+    <h2>Lançamentos (últimos 10 dias)</h2>
+    <div class="games-container" id="recent-games"></div>
+  </div>
 
-  <button id="fab" class="fab" onclick="window.location.href='upload.html'">+</button>
+  <div class="game-section">
+    <h2>Recomendações</h2>
+    <div class="games-container" id="recommended-games"></div>
+  </div>
+
+  <button id="fab" class="fab" onclick="window.location.href='upload.html'">
+    <i class="fa fa-plus"></i>
+  </button>
 
   <footer><p>Dev: Caio Multiversando</p></footer>
+
+
 <script src="log.js">log.js</script>
 <script>
   
