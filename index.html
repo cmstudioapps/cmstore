@@ -156,82 +156,115 @@
   <footer><p>Dev: Caio Multiversando</p></footer>
   <script src="log.js"></script>
   <script>
+    var fab = document.getElementById("fab");
+    if (!localStorage.getItem("modo") || localStorage.getItem("modo") != "1") {
+      fab.style.display = "none";
+    } else {
+      fab.style.display = "block";
+    }
+  </script>
+  <script>
     var db = firebase.database();
 
-function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
-
-function loadGames() { db.ref('jogos/').once('value', snapshot => { const recentContainer = document.getElementById('recent-games'); const recommendedContainer = document.getElementById('recommended-games'); recentContainer.innerHTML = ""; recommendedContainer.innerHTML = "";
-
-const now = new Date();
-const games = [];
-snapshot.forEach(child => {
-  const game = child.val();
-  game.key = child.key;
-  games.push(game);
-});
-
-const shuffledGames = shuffleArray(games);
-const searchParam = obterParametro("p");
-
-if (searchParam) {
-  const game = games.find(g => g.key === searchParam);
-  if (game) {
-    recentContainer.appendChild(createGameCard(game));
-  } else {
-    const notFound = document.createElement("p");
-    notFound.textContent = "Jogo não encontrado.";
-    recentContainer.appendChild(notFound);
-  }
-} else {
-  games.forEach(game => {
-    const gameDate = new Date(game.dataEnvio);
-    const diffTime = Math.abs(now - gameDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays <= 10) {
-      recentContainer.appendChild(createGameCard(game));
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     }
-  });
 
-  shuffledGames.forEach(game => {
-    recommendedContainer.appendChild(createGameCard(game));
-  });
+    function loadGames() {
+      db.ref('jogos/').once('value', snapshot => {
+        const recentContainer = document.getElementById('recent-games');
+        const recommendedContainer = document.getElementById('recommended-games');
+        recentContainer.innerHTML = "";
+        recommendedContainer.innerHTML = "";
+
+        const now = new Date();
+        const games = [];
+        snapshot.forEach(child => {
+          const game = child.val();
+          game.key = child.key;
+          games.push(game);
+        });
+
+        const shuffledGames = shuffleArray(games);
+        const searchParam = obterParametro("p"); // Obtém o parâmetro 'p' da URL
+
+        if (searchParam) {
+          // Se houver um parâmetro de pesquisa, exibe apenas o jogo correspondente
+          const game = games.find(g => g.key === searchParam);
+          if (game) {
+            recentContainer.innerHTML = createGameCard(game);
+          } else {
+            recentContainer.innerHTML = "<p>Jogo não encontrado.</p>";
+          }
+        } else {
+          // Se não houver pesquisa, mostra'' normalmente
+          games.forEach(game => {
+            const gameDate = new Date(game.dataEnvio);
+            const diffTime = Math.abs(now - gameDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 10) {
+              recentContainer.innerHTML += createGameCard(game);
+            }
+          });
+
+          shuffledGames.forEach(game => {
+            recommendedContainer.innerHTML += createGameCard(game);
+          });
+        }
+
+        scrollToGame();
+      });
+    }
+
+   function createGameCard(game) {
+  const videoIframe = game.video
+    ? `<iframe width="100%" height="200" src="${game.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+    : "";
+
+  return `
+    <div class="game-card" onclick="window.location.href='game.html?id=${game.key}'" style="cursor: pointer;">
+      <img src="${game.icone}" alt="Ícone do Jogo" class="game-icon">
+      <h2 class="game-title">${game.nome}</h2>
+      <strong>${game.genero}</strong>
+      <details>
+        <summary>Sobre o jogo</summary>
+        <p class="game-description">${game.descricao}</p>
+        <p>${game.versao}</p>
+      </details>
+      ${videoIframe}
+    </div>`;
 }
 
-scrollToGame();
+    function toggleMenu() {
+      document.getElementById("mobileMenu").classList.toggle("active");
+    }
 
-}); }
+    function share(key, name) {
+      let url = window.location.href.split('?')[0] + "?p=" + key;
+      navigator.clipboard.writeText(url);
+      navigator.share({
+        title: name,
+        text: "Venha jogar " + name + "\n" + url
+      });
+    }
 
-function createGameCard(game) { const card = document.createElement("div"); card.classList.add("game-card"); card.style.cursor = "pointer"; card.onclick = () => window.location.href = game.html?id=${game.key};
+    function scrollToGame() {
+      if (window.location.hash) {
+        const targetId = window.location.hash.substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
 
-const img = document.createElement("img"); img.src = game.icone; img.alt = "Ícone do Jogo"; img.classList.add("game-icon"); card.appendChild(img);
-
-const title = document.createElement("h2"); title.classList.add("game-title"); title.textContent = game.nome; card.appendChild(title);
-
-const genre = document.createElement("strong"); genre.textContent = game.genero; card.appendChild(genre);
-
-const details = document.createElement("details"); const summary = document.createElement("summary"); summary.textContent = "Sobre o jogo"; details.appendChild(summary);
-
-const description = document.createElement("p"); description.classList.add("game-description"); description.textContent = game.descricao; details.appendChild(description);
-
-const version = document.createElement("p"); version.textContent = game.versao; details.appendChild(version);
-
-card.appendChild(details);
-
-if (game.video) { const iframe = document.createElement("iframe"); iframe.width = "100%"; iframe.height = "200"; iframe.src = game.video; iframe.frameBorder = "0"; iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"; iframe.allowFullscreen = true; card.appendChild(iframe); }
-
-return card; }
-
-function toggleMenu() { document.getElementById("mobileMenu").classList.toggle("active"); }
-
-function share(key, name) { let url = window.location.href.split('?')[0] + "?p=" + key; navigator.clipboard.writeText(url); navigator.share({ title: name, text: "Venha jogar " + name + "\n" + url }); }
-
-function scrollToGame() { if (window.location.hash) { const targetId = window.location.hash.substring(1); const targetElement = document.getElementById(targetId); if (targetElement) { targetElement.scrollIntoView({ behavior: "smooth" }); } } }
-
-loadGames();
-
-
+    loadGames();
   </script>
-  
+  <script src="main.js"></script>
 </body>
 </html>
