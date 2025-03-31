@@ -156,89 +156,149 @@
     <!-- Conteúdo será preenchido pelo JavaScript -->
   </div>
   <script src="log.js"></script>
-  <script>
+<script>
     // Obter ID do jogo da URL
     const urlParams = new URLSearchParams(window.location.search);
     const gameId = urlParams.get('id');
     
     // Referência ao banco de dados
-    var db = firebase.database();
+    const db = firebase.database();
+    const container = document.getElementById('game-container');
+    
+    // Função auxiliar para criar elementos com atributos
+    function createElement(tag, attributes = {}, textContent = '') {
+        const element = document.createElement(tag);
+        for (const [key, value] of Object.entries(attributes)) {
+            element.setAttribute(key, value);
+        }
+        if (textContent) element.textContent = textContent;
+        return element;
+    }
     
     // Carregar dados do jogo
     db.ref('jogos/' + gameId).once('value').then(snapshot => {
-      const game = snapshot.val();
-      
-      if (game) {
+        const game = snapshot.val();
+        
+        if (!game) {
+            showGameNotFound();
+            return;
+        }
+        
         document.title = `${game.nome} - CM Store`;
         
-        // Criar elementos HTML com os dados do jogo
-        const container = document.getElementById('game-container');
+        // Cabeçalho do jogo
+        const gameHeader = createElement('div', { class: 'game-header' });
         
-        // Verificar se o jogo tem vídeo
-        const videoSection = game.video 
-          ? `<div class="game-section">
-               <h3 class="game-section-title">Vídeo do Jogo</h3>
-               <div class="video-container">
-                 <iframe src="${game.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-               </div>
-             </div>`
-          : '<p class="game-description">Este jogo não possui vídeo demonstrativo.</p>';
+        const gameIcon = createElement('img', {
+            class: 'game-icon-large',
+            src: game.icone,
+            alt: `Ícone do jogo ${game.nome}`
+        });
         
-        container.innerHTML = `
-          <div class="game-header">
-            <img src="${game.icone}" class="game-icon-large">
-            <div>
-              <h1 class="game-title">${game.nome}</h1>
-              <p class="game-developer">Desenvolvedor: ${game.dev || 'Desconhecido'}</p>
-              <div class="game-meta">
-                <span class="game-meta-item">${game.genero}</span>
-                <span class="game-meta-item">Versão: ${game.versao}</span>
-                <span class="game-meta-item">${game.tamanho || 'Tamanho não especificado'}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="game-section">
-            <h3 class="game-section-title">Descrição</h3>
-            <p class="game-description">${game.descricao}</p>
-          </div>
-          
-          ${videoSection}
-          
-          <a href="${game.link}" class="download-btn" target="_blank">BAIXAR JOGO</a>
-          
-          <div class="game-section">
-            <h3 class="game-section-title">Comentários</h3>
-            <div id="disqus_thread"></div>
-            <script>
-              var disqus_config = function () {
-                this.page.url = window.location.href;
-                this.page.identifier = "${gameId}";
-              };
-              (function() {
-                var d = document, s = d.createElement('script');
-                s.src = 'https://cm-store.disqus.com/embed.js';
-                s.setAttribute('data-timestamp', +new Date());
-                (d.head || d.body).appendChild(s);
-              })();
-            </script>
-          </div>
-        `;
-      } else {
-        document.getElementById('game-container').innerHTML = `
-          <h2>Jogo não encontrado</h2>
-          <p>O jogo solicitado não foi encontrado em nossa base de dados.</p>
-          <a href="index.html" class="download-btn">Voltar para a loja</a>
-        `;
-      }
+        const headerContent = createElement('div');
+        const gameTitle = createElement('h1', { class: 'game-title' }, game.nome);
+        const gameDeveloper = createElement('p', { class: 'game-developer' }, `Desenvolvedor: ${game.dev || 'Desconhecido'}`);
+        
+        const gameMeta = createElement('div', { class: 'game-meta' });
+        const genreMeta = createElement('span', { class: 'game-meta-item' }, game.genero);
+        const versionMeta = createElement('span', { class: 'game-meta-item' }, `Versão: ${game.versao}`);
+        const sizeMeta = createElement('span', { class: 'game-meta-item' }, game.tamanho || 'Tamanho não especificado');
+        
+        gameMeta.append(genreMeta, versionMeta, sizeMeta);
+        headerContent.append(gameTitle, gameDeveloper, gameMeta);
+        gameHeader.append(gameIcon, headerContent);
+        
+        // Seção de descrição
+        const descriptionSection = createElement('div', { class: 'game-section' });
+        const descTitle = createElement('h3', { class: 'game-section-title' }, 'Descrição');
+        const descContent = createElement('p', { class: 'game-description' }, game.descricao);
+        descriptionSection.append(descTitle, descContent);
+        
+        // Adicionar ao container principal
+        container.append(gameHeader, descriptionSection);
+        
+        // Seção de vídeo (se existir)
+        if (game.video) {
+            const videoSection = createElement('div', { class: 'game-section' });
+            const videoTitle = createElement('h3', { class: 'game-section-title' }, 'Vídeo do Jogo');
+            
+            const videoContainer = createElement('div', { class: 'video-container' });
+            const videoIframe = createElement('iframe', {
+                src: game.video,
+                frameborder: '0',
+                allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+                allowfullscreen: ''
+            });
+            
+            videoContainer.appendChild(videoIframe);
+            videoSection.append(videoTitle, videoContainer);
+            container.appendChild(videoSection);
+        } else {
+            const noVideo = createElement('p', { class: 'game-description' }, 'Este jogo não possui vídeo demonstrativo.');
+            container.appendChild(noVideo);
+        }
+        
+        // Botão de download
+        const downloadBtn = createElement('a', {
+            class: 'download-btn',
+            href: game.link,
+            target: '_blank'
+        }, 'BAIXAR JOGO');
+        container.appendChild(downloadBtn);
+        
+        // Seção de comentários
+        const commentsSection = createElement('div', { class: 'game-section' });
+        const commentsTitle = createElement('h3', { class: 'game-section-title' }, 'Comentários');
+        const disqusThread = createElement('div', { id: 'disqus_thread' });
+        
+        commentsSection.append(commentsTitle, disqusThread);
+        container.appendChild(commentsSection);
+        
+        // Carregar Disqus
+        loadDisqus(gameId);
+        
     }).catch(error => {
-      console.error("Erro ao carregar dados do jogo:", error);
-      document.getElementById('game-container').innerHTML = `
-        <h2>Erro ao carregar</h2>
-        <p>Ocorreu um erro ao carregar os dados do jogo.</p>
-        <a href="index.html" class="download-btn">Voltar para a loja</a>
-      `;
+        console.error('Erro ao carregar dados do jogo:', error);
+        showErrorLoading();
     });
-  </script>
+    
+    function loadDisqus(gameId) {
+        window.disqus_config = function() {
+            this.page.url = window.location.href;
+            this.page.identifier = gameId;
+        };
+        
+        const script = document.createElement('script');
+        script.src = 'https://cm-store.disqus.com/embed.js';
+        script.setAttribute('data-timestamp', +new Date());
+        (document.head || document.body).appendChild(script);
+    }
+    
+    function showGameNotFound() {
+        container.innerHTML = '';
+        
+        const title = createElement('h2', {}, 'Jogo não encontrado');
+        const message = createElement('p', {}, 'O jogo solicitado não foi encontrado em nossa base de dados.');
+        const backBtn = createElement('a', {
+            class: 'download-btn',
+            href: 'index.html'
+        }, 'Voltar para a loja');
+        
+        container.append(title, message, backBtn);
+    }
+    
+    function showErrorLoading() {
+        container.innerHTML = '';
+        
+        const title = createElement('h2', {}, 'Erro ao carregar');
+        const message = createElement('p', {}, 'Ocorreu um erro ao carregar os dados do jogo.');
+        const backBtn = createElement('a', {
+            class: 'download-btn',
+            href: 'index.html'
+        }, 'Voltar para a loja');
+        
+        container.append(title, message, backBtn);
+    }
+</script>
 </body>
 </html>
