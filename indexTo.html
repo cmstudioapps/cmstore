@@ -1,1 +1,270 @@
-página indisponível 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CM Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; background-color: #004F5F; color: #FFFFFF; }
+
+    .navbar {
+      background-color: #003C4C;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .menu { display: flex; gap: 20px; }
+    .menu a { text-decoration: none; color: #FFFFFF; font-weight: 500; }
+    .hamburger { display: none; font-size: 2em; cursor: pointer; }
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 200px;
+      background-color: #003C4C;
+      flex-direction: column;
+    }
+
+    .mobile-menu a {
+      padding: 10px;
+      text-decoration: none;
+      color: #FFFFFF;
+      display: block;
+      border-bottom: 1px solid #004F5F;
+    }
+
+    h3 { margin-top: 100px; text-align: center; }
+    .containerHorizontal {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      overflow-x: auto;
+      display: flex;
+      gap: 20px;
+      flex-wrap: nowrap;
+      scroll-snap-type: x mandatory;
+    }
+
+    .game-card {
+      background-color: #006373;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 300px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+    }
+
+    @media (max-width: 768px) {
+      .containerHorizontal {
+        flex-direction: row;
+        overflow-x: auto;
+        scroll-snap-type: none;
+      }
+    }
+
+    .game-card:hover { transform: translateY(-5px); }
+    .game-icon { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 2px solid #FFFFFF; }
+    .game-title { font-size: 1.4em; font-weight: 700; margin-bottom: 10px; }
+    .game-description { font-size: 1em; margin-bottom: 20px; color: #f0f0f0; }
+    .actions { display: flex; justify-content: space-around; }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s;
+      color: #FFFFFF;
+    }
+
+    .btn-download { background-color: #FFA000; }
+    .btn-download:hover { background-color: #FF8F00; }
+    .btn-like { background-color: #FF5252; }
+    .btn-like:hover { background-color: #FF1744; }
+
+    .fab {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 56px;
+      height: 56px;
+      background-color: #FFA000;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      color: #FFFFFF;
+      font-size: 2em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fab:hover { background-color: #FF8F00; }
+    footer { background-color: #003C4C; text-align: center; padding: 15px; margin-top: 30px; }
+    footer p { color: #FFFFFF; }
+
+    @media (max-width: 768px) {
+      .menu { display: none; }
+      .hamburger { display: block; }
+      .mobile-menu.active { display: flex; }
+    }
+  </style>
+  <script>
+    // Função para obter parâmetros da URL
+    function obterParametro(nome) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(nome);
+    }
+
+  </script>
+  <script src="alert.js"></script>
+</head>
+<body>
+  <script src="menu.js"></script>
+  <br><br><br><br><br>
+  <h2 style="text-align: center;">Jogo do mês:</h2><br>
+  <img src="readvator.png" alt="" height="300px" style="border-radius: 10%; box-shadow: 0px 9px 8px black;" width="100%">
+
+  <h3>Lançamentos (últimos 10 dias)</h3>
+  <div class="containerHorizontal" id="recent-games"></div>
+
+  <h3>Recomendações</h3>
+  <div class="containerHorizontal" id="recommended-games"></div>
+
+  <button id="fab" class="fab" onclick="window.location.href='upload.html'">+</button>
+
+  <footer><p>Dev: Caio Multiversando</p></footer>
+  <script src="log.js"></script>
+  <script>
+    var fab = document.getElementById("fab");
+    if (!localStorage.getItem("modo") || localStorage.getItem("modo") != "1") {
+      fab.style.display = "none";
+    } else {
+      fab.style.display = "block";
+    }
+  </script>
+  <script>
+    var db = firebase.database();
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function loadGames() {
+      db.ref('jogos/').once('value', snapshot => {
+        const recentContainer = document.getElementById('recent-games');
+        const recommendedContainer = document.getElementById('recommended-games');
+        recentContainer.innerHTML = "";
+        recommendedContainer.innerHTML = "";
+
+        const now = new Date();
+        const games = [];
+        snapshot.forEach(child => {
+          const game = child.val();
+          game.key = child.key;
+          games.push(game);
+        });
+
+        const shuffledGames = shuffleArray(games);
+        const searchParam = obterParametro("p"); // Obtém o parâmetro 'p' da URL
+
+        if (searchParam) {
+          // Se houver um parâmetro de pesquisa, exibe apenas o jogo correspondente
+          const game = games.find(g => g.key === searchParam);
+          if (game) {
+            recentContainer.innerHTML = createGameCard(game);
+          } else {
+            recentContainer.innerHTML = "<p>Jogo não encontrado.</p>";
+          }
+        } else {
+          // Se não houver pesquisa, mostra normalmente
+          games.forEach(game => {
+            const gameDate = new Date(game.dataEnvio);
+            const diffTime = Math.abs(now - gameDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 10) {
+              recentContainer.innerHTML += createGameCard(game);
+            }
+          });
+
+          shuffledGames.forEach(game => {
+            recommendedContainer.innerHTML += createGameCard(game);
+          });
+        }
+
+        scrollToGame();
+      });
+    }
+
+   function createGameCard(game) {
+  const videoIframe = game.video
+    ? `<iframe width="100%" height="200" src="${game.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+    : "";
+
+  return `
+    <div class="game-card" onclick="window.location.href='game.html?id=${game.key}'" style="cursor: pointer;">
+      <img src="${game.icone}" alt="Ícone do Jogo" class="game-icon">
+      <h2 class="game-title">${game.nome}</h2>
+      <strong>${game.genero}</strong>
+      <details>
+        <summary>Sobre o jogo</summary>
+        <p class="game-description">${game.descricao}</p>
+        <p>${game.versao}</p>
+      </details>
+      ${videoIframe}
+    </div>`;
+}
+
+    function toggleMenu() {
+      document.getElementById("mobileMenu").classList.toggle("active");
+    }
+
+    function share(key, name) {
+      let url = window.location.href.split('?')[0] + "?p=" + key;
+      navigator.clipboard.writeText(url);
+      navigator.share({
+        title: name,
+        text: "Venha jogar " + name + "\n" + url
+      });
+    }
+
+    function scrollToGame() {
+      if (window.location.hash) {
+        const targetId = window.location.hash.substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
+
+    loadGames();
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>
