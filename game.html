@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Jogo - CM Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; background-color: #004F5F; color: #FFFFFF; }
+    
+    .navbar {
+      background-color: #003C4C;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+    
+    .back-button { 
+      color: #FFFFFF; 
+      text-decoration: none; 
+      font-size: 1.2em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .game-container {
+      max-width: 800px;
+      margin: 100px auto 30px;
+      padding: 20px;
+      background-color: #006373;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .game-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .game-icon-large {
+      width: 120px;
+      height: 120px;
+      border-radius: 20px;
+      object-fit: cover;
+      border: 3px solid #FFFFFF;
+    }
+    
+    .game-title {
+      font-size: 2em;
+      margin-bottom: 5px;
+    }
+    
+    .game-developer {
+      font-size: 1.2em;
+      color: #f0f0f0;
+      margin-bottom: 10px;
+    }
+    
+    .game-meta {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .game-meta-item {
+      background-color: #004F5F;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    
+    .game-section {
+      margin-bottom: 20px;
+    }
+    
+    .game-section-title {
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #004F5F;
+      padding-bottom: 5px;
+    }
+    
+    .game-description {
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%; /* Proporção 16:9 */
+      height: 0;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 5px;
+    }
+    
+    .download-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background-color: #FFA000;
+      color: #FFFFFF;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 5px;
+      margin-top: 20px;
+      transition: background 0.3s;
+    }
+    
+    .download-btn:hover {
+      background-color: #FF8F00;
+    }
+    
+    @media (max-width: 768px) {
+      .game-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .game-meta {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="back-button">← Voltar</a>
+    <h1>CM Store</h1>
+    <div></div> <!-- Espaço vazio para alinhamento -->
+  </nav>
+  
+  <div class="game-container" id="game-container">
+    <!-- Conteúdo será preenchido pelo JavaScript -->
+  </div>
+  <script src="log.js"></script>
+  <script>
+    // Obter ID do jogo da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameId = urlParams.get('id');
+    
+    // Referência ao banco de dados
+    var db = firebase.database();
+    
+    // Carregar dados do jogo
+    db.ref('jogos/' + gameId).once('value').then(snapshot => {
+      const game = snapshot.val();
+      
+      if (game) {
+        document.title = `${game.nome} - CM Store`;
+        
+        // Criar elementos HTML com os dados do jogo
+        const container = document.getElementById('game-container');
+        
+        // Verificar se o jogo tem vídeo
+        const videoSection = game.video 
+          ? `<div class="game-section">
+               <h3 class="game-section-title">Vídeo do Jogo</h3>
+               <div class="video-container">
+                 <iframe src="${game.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+               </div>
+             </div>`
+          : '<p class="game-description">Este jogo não possui vídeo demonstrativo.</p>';
+        
+        container.innerHTML = `
+          <div class="game-header">
+            <img src="${game.icone}" class="game-icon-large">
+            <div>
+              <h1 class="game-title">${game.nome}</h1>
+              <p class="game-developer">Desenvolvedor: ${game.dev || 'Desconhecido'}</p>
+              <div class="game-meta">
+                <span class="game-meta-item">${game.genero}</span>
+                <span class="game-meta-item">Versão: ${game.versao}</span>
+                <span class="game-meta-item">${game.tamanho || 'Tamanho não especificado'}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="game-section">
+            <h3 class="game-section-title">Descrição</h3>
+            <p class="game-description">${game.descricao}</p>
+          </div>
+          
+          ${videoSection}
+          
+          <a href="${game.link}" class="download-btn" target="_blank">BAIXAR JOGO</a>
+          
+          <div class="game-section">
+            <h3 class="game-section-title">Comentários</h3>
+            <div id="disqus_thread"></div>
+            <script>
+              var disqus_config = function () {
+                this.page.url = window.location.href;
+                this.page.identifier = "${gameId}";
+              };
+              (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://cm-store.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+              })();
+            </script>
+          </div>
+        `;
+      } else {
+        document.getElementById('game-container').innerHTML = `
+          <h2>Jogo não encontrado</h2>
+          <p>O jogo solicitado não foi encontrado em nossa base de dados.</p>
+          <a href="index.html" class="download-btn">Voltar para a loja</a>
+        `;
+      }
+    }).catch(error => {
+      console.error("Erro ao carregar dados do jogo:", error);
+      document.getElementById('game-container').innerHTML = `
+        <h2>Erro ao carregar</h2>
+        <p>Ocorreu um erro ao carregar os dados do jogo.</p>
+        <a href="index.html" class="download-btn">Voltar para a loja</a>
+      `;
+    });
+  </script>
+</body>
+</html>
