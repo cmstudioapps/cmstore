@@ -3,7 +3,7 @@
     "short_name": "CMSTORE",
     "start_url": "index.html",
     "display": "standalone",
-    "background_color": "#ffffff",
+    "background_color": "#004F5F",
     "theme_color": "#000000",
     "icons": [
         {
