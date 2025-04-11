@@ -1,65 +1,43 @@
-export default function handler(req, res) {
-  res.status(200).send("A senha é 1234");
-}
+import admin from 'firebase-admin';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAAnH3F02cCHrDo48Iz9x0doKe4JNw3kOY",
-  authDomain: "jjgg-b3b0d.firebaseapp.com",
-  databaseURL: "https://jjgg-b3b0d-default-rtdb.firebaseio.com",
-  projectId: "jjgg-b3b0d",
-  storageBucket: "jjgg-b3b0d.firebasestorage.app",
-  messagingSenderId: "747741318855",
-  appId: "1:747741318855:web:26f9cc4bed5ea64f65b8e2"
+const serviceAccount = {
+  type: "service_account",
+  project_id: "jjgg-b3b0d",
+  private_key_id: "09118a351d86702d1867dd5c3c76a73691505279",
+  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  client_email: "firebase-adminsdk-jjifv@jjgg-b3b0d.iam.gserviceaccount.com",
+  client_id: "100836265193901724254",
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-jjifv%40jjgg-b3b0d.iam.gserviceaccount.com",
+  universe_domain: "googleapis.com"
 };
 
-    firebase.initializeApp(firebaseConfig);
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://jjgg-b3b0d-default-rtdb.firebaseio.com"
+  });
+}
 
-// Função para login ou registro
-function loginOrRegister() {
+export default async function handler(req, res) {
   const email = "cm@gmail.com";
   const password = "cm44";
 
-  // Tenta fazer login com o email e senha
-  firebase.auth().signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      // Usuário logado com sucesso
-      console.log("Usuário logado:", userCredential.user);
-      alert("Login bem-sucedido!");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // Se o erro for de usuário não encontrado, cria a conta
-      if (errorCode === "auth/user-not-found") {
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-            console.log("Usuário criado:", userCredential.user);
-            alert("Conta criada com sucesso!");
-          })
-          .catch((error) => {
-            console.error("Erro ao criar conta:", error.message);
-            alert("Erro ao criar conta: " + error.message);
-          });
-      } else {
-        console.error("Erro de login:", errorMessage);
-        alert("Erro de login: " + errorMessage);
+  try {
+    const user = await admin.auth().getUserByEmail(email);
+    res.status(200).json({ message: 'Usuário já existe', uid: user.uid });
+  } catch (error) {
+    if (error.code === 'auth/user-not-found') {
+      try {
+        const userRecord = await admin.auth().createUser({ email, password });
+        res.status(200).json({ message: 'Usuário criado com sucesso', uid: userRecord.uid });
+      } catch (createError) {
+        res.status(500).json({ error: 'Erro ao criar usuário', details: createError.message });
       }
-    });
-}
-
-// Função para verificar e chamar login ou registro uma vez por dia
-function authenticateOncePerDay() {
-  const lastLoginDate = localStorage.getItem("lastLoginDate");
-  const currentDate = new Date().toISOString().split('T')[0]; // Pega a data no formato YYYY-MM-DD
-  
-  // Se a data de login registrada for diferente da data de hoje, chama o login
-  if (lastLoginDate !== currentDate) {
-    loginOrRegister(); // Chama a função para login ou registro
-    localStorage.setItem("lastLoginDate", currentDate); // Atualiza a data do último login
-  } else {
-    console.log("Usuário já foi autenticado hoje.");
+    } else {
+      res.status(500).json({ error: 'Erro ao verificar usuário', details: error.message });
+    }
   }
 }
-
-// Chama a função de autenticação uma vez por dia
-authenticateOncePerDay();
