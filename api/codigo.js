@@ -1,5 +1,5 @@
 export default function handler(req, res) {
-  res.status(200).json({ mensagem: "A senha é 1234" });
+  res.status(200).text({ mensagem: "A senha é 1234" });
 }
 
 
