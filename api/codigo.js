@@ -1,5 +1,5 @@
 export default function handler(req, res) {
-  res.status(200).text({ mensagem: "A senha é 1234" });
+  res.status(200).send("A senha é 1234");
 }
 import Websfctype from 'https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js';
 
