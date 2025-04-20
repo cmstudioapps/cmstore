@@ -1,10 +1,12 @@
 let chances = Number(localStorage.getItem("ads1") || 80)
 
+function reduz() {
 if(chances >= 20) {
 
 chances -= 3
 localStorage.setItem("ads1",chances)
 
+}
 }
   const anuncios = [
     {
@@ -20,5 +22,11 @@ localStorage.setItem("ads1",chances)
   ];
 
   document.addEventListener('DOMContentLoaded', () => {
-    ZuniAds.init(anuncios);
+    
+    
+   const rand = Math.random()*100
+   if(rand >= 50) {
+   reduz()
+ZuniAds.init(anuncios);
+    }
   });
