@@ -1,4 +1,11 @@
+let chances = Number(localStorage.getItem("ads1") || 80)
 
+if(chances >= 20) {
+
+chances -= 1
+localStorage.setItem("ads1",chances)
+
+}
   const anuncios = [
     {
       title: "Canal oficial!",
@@ -7,7 +14,7 @@
       link: "https://whatsapp.com/channel/0029VbAsDEWHwXbFgB7dcL2M",
       expiration: "2025-04-25", // formato YYYY-MM-DD
       once: false,
-      chance: 60
+      chance: chances
     }
     
   ];
