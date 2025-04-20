@@ -2,7 +2,7 @@ let chances = Number(localStorage.getItem("ads1") || 80)
 
 if(chances >= 20) {
 
-chances -= 1
+chances -= 3
 localStorage.setItem("ads1",chances)
 
 }
