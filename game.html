@@ -1,40 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-
-<!-- PushAlert -->
-<script type="text/javascript">
-        (function(d, t) {
-                var g = d.createElement(t),
-                s = d.getElementsByTagName(t)[0];
-                g.src = "https://cdn.pushalert.co/integrate_0ccaec8817bb821b417e69ef8b9485a0.js";
-                s.parentNode.insertBefore(g, s);
-        }(document, "script"));
-</script>
-<!-- End PushAlert -->
-
-<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-<script type="text/javascript">
-    aclib.runInterstitial({
-        zoneId: '9777422',
-    });
-</script>
-
-<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalhes do Jogo - CM Store</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
+  <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Roboto', sans-serif; background-color: #004F5F; color: #FFFFFF; }
-    
+    body { font-family: 'Roboto', sans-serif; background-color: #002B36; color: #FFFFFF; }
+
     .navbar {
       background-color: #003C4C;
       padding: 15px 20px;
@@ -46,8 +25,9 @@
       top: 0;
       left: 0;
       z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
-    
+
     .back-button { 
       color: #FFFFFF; 
       text-decoration: none; 
@@ -56,78 +36,84 @@
       align-items: center;
       gap: 5px;
     }
-    
+
     .game-container {
       max-width: 800px;
       margin: 100px auto 30px;
       padding: 20px;
-      background-color: #006373;
+      background-color: #004F5F;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    
+
     .game-header {
       display: flex;
       align-items: center;
       gap: 20px;
       margin-bottom: 20px;
     }
-    
+
     .game-icon-large {
       width: 120px;
       height: 120px;
       border-radius: 20px;
       object-fit: cover;
-      border: 3px solid #FFFFFF;
+      border: 3px solid #FFA000;
     }
-    
+
     .game-title {
       font-size: 2em;
       margin-bottom: 5px;
+      color: #FFA000;
     }
-    
+
     .game-developer {
-      font-size: 1.2em;
+      font-size: 1.1em;
       color: #f0f0f0;
       margin-bottom: 10px;
     }
-    
+
     .game-meta {
       display: flex;
-      gap: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-bottom: 20px;
     }
-    
+
     .game-meta-item {
-      background-color: #004F5F;
+      background-color: #006373;
       padding: 5px 10px;
       border-radius: 5px;
+      font-size: 0.9em;
     }
-    
+
     .game-section {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
-    
+
     .game-section-title {
       font-size: 1.4em;
       margin-bottom: 10px;
-      border-bottom: 2px solid #004F5F;
+      color: #FFA000;
+      border-bottom: 2px solid #FFA000;
       padding-bottom: 5px;
     }
-    
+
     .game-description {
       line-height: 1.6;
       margin-bottom: 20px;
     }
-    
+
     .video-container {
       position: relative;
       padding-bottom: 56.25%; /* Proporção 16:9 */
       height: 0;
       overflow: hidden;
       margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
-    
+
     .video-container iframe {
       position: absolute;
       top: 0;
@@ -135,61 +121,330 @@
       width: 100%;
       height: 100%;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
     }
-    
+
     .download-btn {
       display: block;
       width: 100%;
       padding: 15px;
-      background-color: #FFA000;
+      background: linear-gradient(90deg, #FFA000, #FF6F00);
       color: #FFFFFF;
       text-align: center;
       text-decoration: none;
       font-weight: bold;
       border-radius: 5px;
       margin-top: 20px;
-      transition: background 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
-    
+
     .download-btn:hover {
-      background-color: #FF8F00;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
     }
-    
+
+    .download-btn.disabled {
+      background: linear-gradient(90deg, #607D8B, #455A64);
+      cursor: not-allowed;
+    }
+
+    .screenshots-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .screenshot {
+      width: 100%;
+      border-radius: 8px;
+      border: 2px solid #FFA000;
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+
+    .screenshot:hover {
+      transform: scale(1.03);
+    }
+
+    .age-rating {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+
+    .age-rating.L { background-color: #4CAF50; }
+    .age-rating.10 { background-color: #8BC34A; }
+    .age-rating.12 { background-color: #FFC107; color: #000; }
+    .age-rating.14 { background-color: #FF9800; }
+    .age-rating.16 { background-color: #F44336; }
+    .age-rating.18 { background-color: #D32F2F; }
+
     @media (max-width: 768px) {
       .game-header {
         flex-direction: column;
         text-align: center;
       }
-      
+
       .game-meta {
         justify-content: center;
       }
+
+      .screenshots-container {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
-
-
 </head>
 <body>
   <nav class="navbar">
-    <a href="index.html" class="back-button">← Voltar</a>
-    <h1>CM Store</h1>
-    <button onclick="share()" style="border: none; background-color: transparent; color: white;"><i class="fa-solid fa-share"></i> Share</button>
-    <div></div> <!-- Espaço vazio para alinhamento -->
+    <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i> Voltar</a>
+    <h1 id="nm">CM Store</h1>
+    <button id="share" onclick="share()" style="border: none; background-color: transparent; color: white; font-size: 1.1em; cursor: pointer;">
+      <i class="fa-solid fa-share"></i> Compartilhar
+    </button>
   </nav>
-  
-
-
 
   <div class="game-container" id="game-container">
- 
     <!-- Conteúdo será preenchido pelo JavaScript -->
   </div>
-  <script src="log.js"></script>
-<script>
 
-const d = `Websfctype.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`
-    Websfctype.exct(d);
-</script>
+  <script src="log.js"></script>
+
+  <script>
+    
+// Obter ID do jogo da URL
+const urlParams = new URLSearchParams(window.location.search);
+const gameId = urlParams.get('id');
+
+if (!gameId) {
+  showGameNotFound();
+}
+
+// Referência ao banco de dados
+const db = firebase.database();
+const container = document.getElementById('game-container');
+
+// Função auxiliar para criar elementos com atributos
+function createElement(tag, attributes = {}, textContent = '') {
+  const element = document.createElement(tag);
+  for (const [key, value] of Object.entries(attributes)) {
+    element.setAttribute(key, value);
+  }
+  if (textContent) element.textContent = textContent;
+  return element;
+}
+
+// Carregar dados do jogo
+db.ref('jogos/' + gameId).once('value').then(snapshot => {
+  const game = snapshot.val();
+
+  if (!game) {
+    showGameNotFound();
+    return;
+  }
+
+  document.title = `${game.nome || 'Jogo sem nome'} - CM Store`;
+
+  // Limpar container
+  container.innerHTML = '';
+
+  // Cabeçalho do jogo
+  const gameHeader = createElement('div', { class: 'game-header' });
+
+  const gameIcon = createElement('img', {
+    class: 'game-icon-large',
+    src: game.icone || 'https://via.placeholder.com/120',
+    alt: `Ícone do jogo ${game.nome || ''}`,
+    onerror: "this.src='https://via.placeholder.com/120'"
+  });
+
+  const headerContent = createElement('div');
+  const gameTitle = createElement('h1', { class: 'game-title' }, game.nome || 'Jogo sem nome');
+  const gameDeveloper = createElement('p', { class: 'game-developer' }, `Desenvolvedor: ${game.dev || 'Não especificado'}`);
+
+  const gameMeta = createElement('div', { class: 'game-meta' });
+  
+  // Gênero
+  if (game.genero) {
+    const genreMeta = createElement('span', { class: 'game-meta-item' }, game.genero.charAt(0).toUpperCase() + game.genero.slice(1));
+    gameMeta.appendChild(genreMeta);
+  }
+  
+  // Versão (só mostra se existir e não for anúncio)
+  if (game.versao && game.link) {
+    const versionMeta = createElement('span', { class: 'game-meta-item' }, `Versão: ${game.versao}`);
+    gameMeta.appendChild(versionMeta);
+  }
+  
+  // Classificação indicativa
+  if (game.classificacao) {
+    const ratingMeta = createElement('span', { class: 'game-meta-item' });
+    const ratingSpan = createElement('span', { class: `age-rating ${game.classificacao}` }, game.classificacao === 'L' ? 'Livre' : `${game.classificacao}+`);
+    ratingMeta.appendChild(document.createTextNode('Classificação: '));
+    ratingMeta.appendChild(ratingSpan);
+    gameMeta.appendChild(ratingMeta);
+  }
+  
+  // Tamanho (para jogos antigos)
+  if (game.tamanho) {
+    const sizeMeta = createElement('span', { class: 'game-meta-item' }, `Tamanho: ${game.tamanho}`);
+    gameMeta.appendChild(sizeMeta);
+  }
+
+  headerContent.append(gameTitle, gameDeveloper, gameMeta);
+  gameHeader.append(gameIcon, headerContent);
+
+  // Seção de descrição
+  const descriptionSection = createElement('div', { class: 'game-section' });
+  const descTitle = createElement('h3', { class: 'game-section-title' }, 'Descrição');
+  const descContent = createElement('p', { class: 'game-description' }, 
+    game.descricao || 'Este jogo não possui descrição disponível.');
+  descriptionSection.append(descTitle, descContent);
+
+  // Adicionar ao container principal
+  container.append(gameHeader, descriptionSection);
+
+  // Seção de screenshots (se existir)
+  if (game.prints && game.prints.length > 0) {
+    const screenshotsSection = createElement('div', { class: 'game-section' });
+    const screenshotsTitle = createElement('h3', { class: 'game-section-title' }, 'Imagens do Jogo');
+    
+    const screenshotsContainer = createElement('div', { class: 'screenshots-container' });
+    
+    game.prints.slice(0, 3).forEach(print => {
+      const screenshot = createElement('img', {
+        class: 'screenshot',
+        src: print,
+        alt: 'Screenshot do jogo',
+        loading: 'lazy'
+      });
+      screenshotsContainer.appendChild(screenshot);
+    });
+    
+    screenshotsSection.append(screenshotsTitle, screenshotsContainer);
+    container.appendChild(screenshotsSection);
+  }
+
+  // Seção de vídeo (se existir)
+  if (game.video) {
+    const videoSection = createElement('div', { class: 'game-section' });
+    const videoTitle = createElement('h3', { class: 'game-section-title' }, 'Vídeo do Jogo');
+
+    const videoContainer = createElement('div', { class: 'video-container' });
+    const videoIframe = createElement('iframe', {
+      src: game.video,
+      frameborder: '0',
+      allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+      allowfullscreen: ''
+    });
+
+    videoContainer.appendChild(videoIframe);
+    videoSection.append(videoTitle, videoContainer);
+    container.appendChild(videoSection);
+  }
+
+  // Botão de download (só mostra se não for apenas anúncio)
+  if (game.link) {
+    const downloadBtn = createElement('a', {
+      class: 'download-btn',
+      href: game.link,
+      target: '_blank'
+    }, 'BAIXAR JOGO');
+    container.appendChild(downloadBtn);
+  } else {
+    const downloadBtn = createElement('div', {
+      class: 'download-btn disabled'
+    }, 'EM BREVE');
+    container.appendChild(downloadBtn);
+  }
+
+  // Seção de comentários
+  const commentsSection = createElement('div', { class: 'game-section' });
+  const commentsTitle = createElement('h3', { class: 'game-section-title' }, 'Comentários');
+  const disqusThread = createElement('div', { id: 'disqus_thread' });
+
+  commentsSection.append(commentsTitle, disqusThread);
+  container.appendChild(commentsSection);
+
+  // Carregar Disqus
+  loadDisqus(gameId);
+
+}).catch(error => {
+  console.error('Erro ao carregar dados do jogo:', error);
+  showErrorLoading();
+});
+
+function loadDisqus(gameId) {
+  window.disqus_config = function() {
+    this.page.url = window.location.href;
+    this.page.identifier = gameId;
+  };
+
+  const script = document.createElement('script');
+  script.src = 'https://cm-store.disqus.com/embed.js';
+  script.setAttribute('data-timestamp', +new Date());
+  (document.head || document.body).appendChild(script);
+}
+
+function showGameNotFound() {
+  container.innerHTML = '';
+
+  const title = createElement('h2', {style: 'color: #FFA000; margin-bottom: 15px;'}, 'Jogo não encontrado');
+  const message = createElement('p', {style: 'margin-bottom: 20px;'}, 
+    'O jogo solicitado não foi encontrado em nossa base de dados.');
+  const backBtn = createElement('a', {
+    class: 'download-btn',
+    href: 'index.html',
+    style: 'text-align: center;'
+  }, 'Voltar para a loja');
+
+  container.append(title, message, backBtn);
+}
+
+function showErrorLoading() {
+  container.innerHTML = '';
+
+  const title = createElement('h2', {style: 'color: #FFA000; margin-bottom: 15px;'}, 'Erro ao carregar');
+  const message = createElement('p', {style: 'margin-bottom: 20px;'}, 
+    'Ocorreu um erro ao carregar os dados do jogo. Por favor, tente novamente mais tarde.');
+  const backBtn = createElement('a', {
+    class: 'download-btn',
+    href: 'index.html',
+    style: 'text-align: center;'
+  }, 'Voltar para a loja');
+
+  container.append(title, message, backBtn);
+}
+
+function share() {
+  if (navigator.share) {
+    navigator.share({
+      title: document.title,
+      text: 'Confira este jogo na CM Store!',
+      url: window.location.href
+    }).catch(err => {
+      console.log('Erro ao compartilhar:', err);
+      fallbackShare();
+    });
+  } else {
+    fallbackShare();
+  }
+}
+
+function fallbackShare() {
+  // Copia a URL para a área de transferência
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    alert('Link copiado para a área de transferência!');
+  }).catch(err => {
+    console.log('Erro ao copiar link:', err);
+    prompt('Copie o link abaixo:', window.location.href);
+  });
+}
+  </script>
 </body>
 </html>
