@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel de Envio - CM Store</title>
-  
+
   <!-- Fontes e Ícones -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
 
   <style>
@@ -26,6 +27,7 @@
       background: linear-gradient(135deg, #002B36, #004F5F);
       color: #FFFFFF;
       padding: 20px;
+      min-height: 100vh;
     }
 
     h1 {
@@ -37,26 +39,50 @@
     }
 
     .form-container {
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
       background: rgba(0, 60, 76, 0.9);
-      padding: 20px;
+      padding: 25px;
       border-radius: 10px;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
       position: relative;
     }
 
+    .form-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(0, 40, 50, 0.5);
+      border-radius: 8px;
+    }
+
+    .form-section h2 {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      color: #FFA000;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-section h2 i {
+      margin-right: 10px;
+    }
+
     label {
       font-weight: 500;
       display: block;
-      margin-top: 10px;
-      font-size: 1.1em;
+      margin-top: 15px;
+      font-size: 1em;
+    }
+
+    .required:after {
+      content: " *";
+      color: #FF5252;
     }
 
     .input-group {
       position: relative;
-      margin-top: 5px;
+      margin-top: 8px;
     }
 
     .input-group input,
@@ -70,11 +96,12 @@
       font-size: 1em;
       outline: none;
       transition: 0.3s;
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .input-group textarea {
       resize: none;
-      height: 80px;
+      height: 100px;
     }
 
     .input-group input:focus,
@@ -92,37 +119,145 @@
       font-size: 1.2em;
     }
 
-    button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(90deg, #FFA000, #FF6F00);
-      border: none;
-      color: #FFFFFF;
-      font-size: 1.2em;
-      cursor: pointer;
-      border-radius: 5px;
+    .checkbox-group {
+      display: flex;
+      align-items: center;
       margin-top: 15px;
-      transition: 0.3s;
-      font-weight: bold;
     }
 
-    button:hover {
-      transform: scale(1.05);
+    .checkbox-group input {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .file-upload {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+
+    .file-upload-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .file-upload-item i {
+      margin-right: 10px;
+      color: #FFA000;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .preview-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 2px solid #FFA000;
+    }
+
+    .buttons-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      color: #FFFFFF;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: 0.3s;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button i {
+      margin-right: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #FFA000, #FF6F00);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.03);
       background: linear-gradient(90deg, #FF6F00, #FFA000);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(90deg, #607D8B, #455A64);
+    }
+
+    .btn-secondary:hover {
+      transform: scale(1.03);
+      background: linear-gradient(90deg, #455A64, #607D8B);
     }
 
     .alert {
       text-align: center;
       font-size: 1em;
       margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
     }
 
     .success {
+      background-color: rgba(0, 230, 118, 0.2);
       color: #00E676;
+      display: block;
     }
 
     .error {
+      background-color: rgba(255, 82, 82, 0.2);
       color: #FF5252;
+      display: block;
+    }
+
+    .loading {
+      background-color: rgba(255, 160, 0, 0.2);
+      color: #FFA000;
+      display: block;
+    }
+
+    .status-indicator {
+      font-size: 0.9em;
+      margin-top: 5px;
+      color: #FFA000;
+    }
+
+    .age-rating {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .age-rating label {
+      display: flex;
+      align-items: center;
+      margin-top: 0;
+      padding: 5px 10px;
+      background: rgba(255, 160, 0, 0.2);
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .age-rating input {
+      margin-right: 5px;
     }
   </style>
 </head>
@@ -131,75 +266,396 @@
   <h1>Painel de Envio de Jogos</h1>
 
   <div class="form-container">
-    <label for="nome">Nome do Jogo:</label>
-    <div class="input-group">
-      <i class="fas fa-gamepad"></i>
-      <input type="text" id="nome" placeholder="Digite o nome do jogo">
+    <div class="form-section">
+      <h2><i class="fas fa-info-circle"></i> Informações Básicas</h2>
+      
+      <label for="senha" class="required">Package:</label>
+      <div class="input-group">
+        <i class="fas fa-box"></i>
+        <input type="text" id="senha" placeholder="ex: com-mygame-myname" onchange="carregarJogoExistente()">
+      </div>
+      <p class="status-indicator" id="package-status">Digite o package para verificar disponibilidade</p>
+
+      <label for="nome" class="required">Nome do Jogo:</label>
+      <div class="input-group">
+        <i class="fas fa-gamepad"></i>
+        <input type="text" id="nome" placeholder="Digite o nome do jogo">
+      </div>
+
+      <label for="descricao" class="required">Descrição:</label>
+      <div class="input-group">
+        <i class="fas fa-align-left"></i>
+        <textarea id="descricao" placeholder="Descreva o jogo"></textarea>
+      </div>
+
+      <label for="genero" class="required">Gênero do Jogo:</label>
+      <div class="input-group">
+        <i class="fas fa-tags"></i>
+        <select id="genero">
+          <option value="ação">Ação</option>
+          <option value="aventura">Aventura</option>
+          <option value="rpg">RPG</option>
+          <option value="corrida">Corrida</option>
+          <option value="esporte">Esporte</option>
+          <option value="estratégia">Estratégia</option>
+          <option value="simulação">Simulação</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+
+      <label>Classificação Indicativa:</label>
+      <div class="age-rating">
+        <label><input type="radio" name="classificacao" value="L" checked> Livre</label>
+        <label><input type="radio" name="classificacao" value="10"> 10+</label>
+        <label><input type="radio" name="classificacao" value="12"> 12+</label>
+        <label><input type="radio" name="classificacao" value="14"> 14+</label>
+        <label><input type="radio" name="classificacao" value="16"> 16+</label>
+        <label><input type="radio" name="classificacao" value="18"> 18+</label>
+      </div>
     </div>
 
-    <label for="descricao">Descrição:</label>
-    <div class="input-group">
-      <i class="fas fa-align-left"></i>
-      <textarea id="descricao" placeholder="Descreva o jogo"></textarea>
+    <div class="form-section">
+      <h2><i class="fas fa-images"></i> Mídia</h2>
+      
+      <label for="icone" class="required">Ícone (Imagem):</label>
+      <div class="file-upload">
+        <input type="file" id="icone" accept="image/*">
+        <div class="preview-container" id="icone-preview"></div>
+      </div>
+
+      <label>Prints do Jogo (Máx. 3):</label>
+      <div class="file-upload">
+        <input type="file" id="prints" accept="image/*" multiple>
+        <div class="preview-container" id="prints-preview"></div>
+      </div>
+
+      <label for="video">Link do Vídeo (YouTube):</label>
+      <div class="input-group">
+        <i class="fas fa-video"></i>
+        <input type="url" id="video" placeholder="https://www.youtube.com/...">
+      </div>
     </div>
 
-    <label for="icone">Ícone (Imagem):</label>
-    <div class="input-group">
-      <i class="fas fa-image"></i>
-      <input type="file" id="icone">
+    <div class="form-section">
+      <h2><i class="fas fa-download"></i> Detalhes do Download</h2>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="anuncio" onchange="toggleDownloadFields()">
+        <label for="anuncio">Apenas anúncio (sem link de download)</label>
+      </div>
+
+      <div id="download-fields">
+        <label for="v" class="required">Versão:</label>
+        <div class="input-group">
+          <i class="fas fa-code-branch"></i>
+          <input type="number" id="v" placeholder="ex: 1.0..." step="0.1">
+        </div>
+
+        <label for="link" class="required">Link do Jogo (MediaFire):</label>
+        <div class="input-group">
+          <i class="fas fa-link"></i>
+          <input type="url" id="link" placeholder="https://www.mediafire.com/...">
+        </div>
+      </div>
     </div>
 
-    <label for="v">Versão:</label>
-    <div class="input-group">
-      <i class="fas fa-code-branch"></i>
-      <input type="number" id="v" placeholder="ex: 1.0...">
+    <div class="buttons-container">
+      <button class="btn-primary" onclick="enviarJogo()">
+        <i class="fas fa-paper-plane"></i> Enviar Jogo
+      </button>
+      <button class="btn-secondary" onclick="limparCampos()">
+        <i class="fas fa-broom"></i> Limpar
+      </button>
     </div>
-
-    <label for="senha">Package:</label>
-    <div class="input-group">
-      <i class="fas fa-box"></i>
-      <input type="text" id="senha" placeholder="ex: com-mygame-myname">
-    </div>
-
-    <label for="genero">Gênero do Jogo:</label>
-    <div class="input-group">
-      <i class="fas fa-tags"></i>
-      <select id="genero">
-        <option value="ação">Ação</option>
-        <option value="aventura">Aventura</option>
-        <option value="rpg">RPG</option>
-        <option value="corrida">Corrida</option>
-        <option value="esporte">Esporte</option>
-        <option value="estratégia">Estratégia</option>
-        <option value="simulação">Simulação</option>
-        <option value="outro">Outro</option>
-      </select>
-    </div>
-
-    <label for="link">Link do Jogo (MediaFire):</label>
-    <div class="input-group">
-      <i class="fas fa-link"></i>
-      <input type="url" id="link" placeholder="https://www.mediafire.com/...">
-    </div>
-
-    <label for="video">Link do Vídeo (YouTube):</label>
-    <div class="input-group">
-      <i class="fas fa-video"></i>
-      <input type="url" id="video" placeholder="https://www.youtube.com/...">
-    </div>
-
-    <button onclick="enviarJogo()">
-      <i class="fas fa-paper-plane"></i> Enviar Jogo
-    </button>
 
     <p class="alert" id="alerta"></p>
   </div>
 
-
 <script src="log.js"></script>
 <script>
-  const upl = `Websfctype.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`
-  Websfctype.exct(upl);
+  const db = firebase.database();
+  let icone = null;
+  let prints = [];
+  let isEditing = false;
+  let currentGameId = null;
+
+  // Configura os listeners para os uploads de imagens
+  document.addEventListener('DOMContentLoaded', function() {
+    // Listener para o ícone
+    document.getElementById('icone').addEventListener('change', function(e) {
+      if (e.target.files.length) {
+        uploadImage(e.target.files[0], 'icone').then(url => {
+          icone = url;
+          document.getElementById('icone-preview').innerHTML = `
+            <img src="${url}" class="preview-image" alt="Prévia do ícone">
+          `;
+        });
+      }
+    });
+
+    // Listener para os prints
+    document.getElementById('prints').addEventListener('change', function(e) {
+      if (e.target.files.length) {
+        // Limita a 3 imagens
+        const files = Array.from(e.target.files).slice(0, 3);
+        prints = [];
+        const previewContainer = document.getElementById('prints-preview');
+        previewContainer.innerHTML = '';
+        
+        files.forEach((file, index) => {
+          uploadImage(file, `print-${index}`).then(url => {
+            prints.push(url);
+            previewContainer.innerHTML += `
+              <img src="${url}" class="preview-image" alt="Prévia do print ${index + 1}">
+            `;
+          });
+        });
+      }
+    });
+  });
+
+  function toggleDownloadFields() {
+    const downloadFields = document.getElementById('download-fields');
+    const isAnuncio = document.getElementById('anuncio').checked;
+    
+    if (isAnuncio) {
+      downloadFields.style.opacity = '0.5';
+      downloadFields.style.pointerEvents = 'none';
+      document.querySelectorAll('#download-fields .required').forEach(el => {
+        el.classList.remove('required');
+      });
+    } else {
+      downloadFields.style.opacity = '1';
+      downloadFields.style.pointerEvents = 'auto';
+      document.querySelectorAll('#download-fields label[for="v"], #download-fields label[for="link"]').forEach(el => {
+        el.classList.add('required');
+      });
+    }
+  }
+
+  function carregarJogoExistente() {
+    const senhaGame = document.getElementById('senha').value.trim();
+    if (!senhaGame) return;
+
+    const idUser = localStorage.getItem('idUser');
+    const packageStatus = document.getElementById('package-status');
+    
+    const jogoRef = db.ref(`jogos/${senhaGame}`);
+    jogoRef.once('value').then(snapshot => {
+      const jogo = snapshot.val();
+      
+      if (jogo) {
+        if (jogo.idUser === idUser) {
+          // O jogo existe e pertence ao usuário - modo edição
+          packageStatus.textContent = 'Jogo encontrado. Modo edição ativado.';
+          packageStatus.style.color = '#4CAF50';
+          preencherCamposEdicao(jogo);
+          isEditing = true;
+          currentGameId = senhaGame;
+        } else {
+          // O jogo existe mas pertence a outro usuário
+          packageStatus.textContent = 'Este package já está em uso por outro desenvolvedor.';
+          packageStatus.style.color = '#FF5252';
+          isEditing = false;
+          currentGameId = null;
+        }
+      } else {
+        // Package disponível
+        packageStatus.textContent = 'Package disponível para uso.';
+        packageStatus.style.color = '#FFA000';
+        isEditing = false;
+        currentGameId = null;
+      }
+    });
+  }
+
+  function preencherCamposEdicao(jogo) {
+    document.getElementById('nome').value = jogo.nome || '';
+    document.getElementById('descricao').value = jogo.descricao || '';
+    document.getElementById('genero').value = jogo.genero || 'ação';
+    document.getElementById('v').value = jogo.versao || '';
+    document.getElementById('link').value = jogo.link || '';
+    document.getElementById('video').value = jogo.video ? `https://www.youtube.com/watch?v=${jogo.video.split('/').pop()}` : '';
+    
+    // Classificação indicativa
+    if (jogo.classificacao) {
+      document.querySelector(`input[name="classificacao"][value="${jogo.classificacao}"]`).checked = true;
+    }
+    
+    // Verifica se é apenas anúncio
+    const isAnuncio = !jogo.link;
+    document.getElementById('anuncio').checked = isAnuncio;
+    toggleDownloadFields();
+    
+    // Carrega as imagens
+    if (jogo.icone) {
+      icone = jogo.icone;
+      document.getElementById('icone-preview').innerHTML = `
+        <img src="${jogo.icone}" class="preview-image" alt="Prévia do ícone">
+      `;
+    }
+    
+    if (jogo.prints && jogo.prints.length) {
+      prints = jogo.prints;
+      const previewContainer = document.getElementById('prints-preview');
+      previewContainer.innerHTML = '';
+      jogo.prints.forEach((print, index) => {
+        previewContainer.innerHTML += `
+          <img src="${print}" class="preview-image" alt="Prévia do print ${index + 1}">
+        `;
+      });
+    }
+  }
+
+  async function enviarJogo() {
+    const nome = document.getElementById('nome').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const genero = document.getElementById('genero').value;
+    const link = document.getElementById('link').value.trim();
+    const video = document.getElementById('video').value.trim();
+    const alerta = document.getElementById('alerta');
+    const v = document.getElementById('v').value.trim();
+    const dev = localStorage.getItem('nome');
+    const senhaGame = document.getElementById('senha').value.trim();
+    const idUser = localStorage.getItem('idUser');
+    const isAnuncio = document.getElementById('anuncio').checked;
+    const classificacao = document.querySelector('input[name="classificacao"]:checked').value;
+
+    // Validação básica
+    if (!nome || !descricao || !senhaGame || !genero) {
+      showAlert('Preencha todos os campos obrigatórios!', 'error');
+      return;
+    }
+
+    // Validação para downloads (se não for apenas anúncio)
+    if (!isAnuncio && (!v || !link)) {
+      showAlert('Para enviar o jogo com download, preencha a versão e o link!', 'error');
+      return;
+    }
+
+    if (!isAnuncio && !link.startsWith('https://www.mediafire.com/')) {
+      showAlert('O link deve ser do MediaFire!', 'error');
+      return;
+    }
+
+    if (!icone) {
+      showAlert('Por favor, faça o upload do ícone!', 'error');
+      return;
+    }
+
+    const videoEmbed = video ? converterParaEmbed(video) : null;
+    const jogoRef = db.ref(`jogos/${senhaGame}`);
+    
+    showAlert('Enviando dados...', 'loading');
+
+    const gameData = {
+      idUser,
+      nome,
+      descricao,
+      icone,
+      genero,
+      versao: isAnuncio ? null : v,
+      link: isAnuncio ? null : link,
+      dev,
+      packge: senhaGame,
+      video: videoEmbed,
+      classificacao,
+      dataEnvio: Date.now(),
+      prints: prints.length ? prints : null
+    };
+
+    try {
+      if (isEditing && currentGameId === senhaGame) {
+        // Modo edição
+        await jogoRef.update(gameData);
+        showAlert('Jogo atualizado com sucesso!', 'success');
+        setTimeout(() => {
+          window.location.href = `game.html?id=${senhaGame}`;
+        }, 1500);
+      } else {
+        // Modo criação
+        await jogoRef.set(gameData);
+        showAlert('Jogo enviado com sucesso!', 'success');
+        setTimeout(() => {
+          window.location.href = `game.html?id=${senhaGame}`;
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar jogo:', error);
+      showAlert('Erro ao enviar o jogo!', 'error');
+    }
+  }
+
+  function showAlert(message, type) {
+    const alerta = document.getElementById('alerta');
+    alerta.textContent = message;
+    alerta.className = `alert ${type}`;
+  }
+
+  function limparCampos() {
+    document.getElementById('nome').value = '';
+    document.getElementById('descricao').value = '';
+    document.getElementById('icone').value = '';
+    document.getElementById('prints').value = '';
+    document.getElementById('link').value = '';
+    document.getElementById('video').value = '';
+    document.getElementById('v').value = '';
+    document.getElementById('senha').value = '';
+    document.getElementById('genero').value = 'ação';
+    document.querySelector('input[name="classificacao"][value="L"]').checked = true;
+    document.getElementById('anuncio').checked = false;
+    document.getElementById('icone-preview').innerHTML = '';
+    document.getElementById('prints-preview').innerHTML = '';
+    document.getElementById('package-status').textContent = 'Digite o package para verificar disponibilidade';
+    document.getElementById('package-status').style.color = '#FFA000';
+    toggleDownloadFields();
+    
+    icone = null;
+    prints = [];
+    isEditing = false;
+    currentGameId = null;
+    
+    showAlert('', ''); // Limpa o alerta
+  }
+
+  function converterParaEmbed(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}`;
+    }
+    return null;
+  }
+
+  async function uploadImage(file, name) {
+    showAlert(`Enviando ${name === 'icone' ? 'ícone' : 'imagem'}...`, 'loading');
+    
+    const apiKey = '69b81d859b87c87a4474477f06f1b02d';
+    const formData = new FormData();
+    formData.append('key', apiKey);
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        showAlert('Imagem enviada com sucesso!', 'success');
+        setTimeout(() => {
+          showAlert('', ''); // Limpa o alerta após 2 segundos
+        }, 2000);
+        return result.data.url;
+      } else {
+        throw new Error(result.error.message);
+      }
+    } catch (error) {
+      showAlert(`Erro ao enviar imagem: ${error.message}`, 'error');
+      throw error;
+    }
+  }
 </script>
 </body>
 </html>
