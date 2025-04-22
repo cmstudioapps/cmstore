@@ -1,20 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-
-
-
-<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-
-
-
-
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CM Store</title>
-<link href="app.json" rel="manifest">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -22,7 +13,7 @@
   <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Roboto', sans-serif; background-color: #004F5F; color: #FFFFFF; }
+    body { font-family: 'Roboto', sans-serif; background-color: #002B36; color: #FFFFFF; }
 
     .navbar {
       background-color: #003C4C;
@@ -35,30 +26,59 @@
       top: 0;
       left: 0;
       z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
 
     .menu { display: flex; gap: 20px; }
     .menu a { text-decoration: none; color: #FFFFFF; font-weight: 500; }
-    .hamburger { display: none; font-size: 2em; cursor: pointer; }
+    .hamburger { display: none; font-size: 1.5em; cursor: pointer; }
     .mobile-menu {
       display: none;
       position: absolute;
       top: 60px;
-      right: 0;
+      right: 20px;
       width: 200px;
       background-color: #003C4C;
       flex-direction: column;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 1001;
     }
 
     .mobile-menu a {
-      padding: 10px;
+      padding: 12px 15px;
       text-decoration: none;
       color: #FFFFFF;
       display: block;
       border-bottom: 1px solid #004F5F;
     }
 
-    h3 { margin-top: 100px; text-align: center; }
+    .mobile-menu a:hover {
+      background-color: #004F5F;
+    }
+
+    h2, h3 { 
+      text-align: center; 
+      margin: 20px 0 10px;
+      color: #FFA000;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      margin: 100px 0 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .section-title:after {
+      content: "";
+      display: block;
+      width: 100px;
+      height: 3px;
+      background: #FFA000;
+      margin: 10px auto;
+    }
+
     .containerHorizontal {
       max-width: 1200px;
       margin: 20px auto;
@@ -68,181 +88,244 @@
       gap: 20px;
       flex-wrap: nowrap;
       scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .containerHorizontal::-webkit-scrollbar {
+      display: none;
     }
 
     .game-card {
-      background-color: #006373;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 300px;
-      padding: 20px;
+      background: linear-gradient(135deg, #004F5F, #006373);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      width: 280px;
+      padding: 15px;
       text-align: center;
-      transition: transform 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
       flex-shrink: 0;
       scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
     }
 
-    @media (max-width: 768px) {
-      .containerHorizontal {
-        flex-direction: row;
-        overflow-x: auto;
-        scroll-snap-type: none;
-      }
+    .game-card:hover { 
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
     }
 
-    .game-card:hover { transform: translateY(-5px); }
-    .game-icon { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 2px solid #FFFFFF; }
-    .game-title { font-size: 1.4em; font-weight: 700; margin-bottom: 10px; }
-    .game-description { font-size: 1em; margin-bottom: 20px; color: #f0f0f0; }
-    .actions { display: flex; justify-content: space-around; }
+    .game-card.coming-soon {
+      border: 2px solid #FFA000;
+    }
 
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s;
+    .coming-soon-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #FFA000;
+      color: #002B36;
+      padding: 3px 8px;
+      border-radius: 15px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+
+    .game-icon { 
+      width: 100px; 
+      height: 100px; 
+      border-radius: 20px; 
+      object-fit: cover; 
+      margin-bottom: 15px; 
+      border: 3px solid #FFA000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .game-title { 
+      font-size: 1.3em; 
+      font-weight: 700; 
+      margin-bottom: 8px; 
       color: #FFFFFF;
     }
 
-    .btn-download { background-color: #FFA000; }
-    .btn-download:hover { background-color: #FF8F00; }
-    .btn-like { background-color: #FF5252; }
-    .btn-like:hover { background-color: #FF1744; }
+    .game-genre {
+      font-size: 0.9em;
+      color: #FFA000;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .game-description { 
+      font-size: 0.9em; 
+      margin-bottom: 15px; 
+      color: #f0f0f0; 
+      line-height: 1.5;
+    }
+
+    .game-version {
+      font-size: 0.8em;
+      color: #BDBDBD;
+      margin-bottom: 10px;
+    }
+
+    .featured-game {
+      max-width: 800px;
+      margin: 30px auto;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .featured-game img {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 15px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+      border: 3px solid #FFA000;
+    }
+
+    .featured-game h2 {
+      margin: 15px 0;
+      font-size: 2em;
+    }
+
+    .featured-game p {
+      max-width: 600px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
 
     .fab {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 56px;
-      height: 56px;
-      background-color: #FFA000;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #FFA000, #FF6F00);
       border: none;
       border-radius: 50%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       color: #FFFFFF;
-      font-size: 2em;
+      font-size: 1.5em;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 999;
+      transition: transform 0.3s;
     }
 
-    .fab:hover { background-color: #FF8F00; }
-    footer { background-color: #003C4C; text-align: center; padding: 15px; margin-top: 30px; }
-    footer p { color: #FFFFFF; }
+    .fab:hover { 
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    }
+
+    footer { 
+      background-color: #003C4C; 
+      text-align: center; 
+      padding: 20px; 
+      margin-top: 50px;
+    }
+
+    footer p { 
+      color: #BDBDBD; 
+      font-size: 0.9em;
+    }
 
     @media (max-width: 768px) {
       .menu { display: none; }
       .hamburger { display: block; }
-      .mobile-menu.active { display: flex; }
+      
+      .section-title {
+        margin-top: 80px;
+        font-size: 1.5em;
+      }
+      
+      .game-card {
+        width: 250px;
+      }
+      
+      .featured-game img {
+        max-width: 300px;
+      }
+    }
+    .logo {
+      
+      color: white ;
+      font-weight: bold;
+      
     }
   </style>
-  <script>
-    // Função para obter parâmetros da URL
-    function obterParametro(nome) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(nome);
-    }
-
-  </script>
-  <script src="alert.js"></script>
 </head>
 <body>
-  <script src="menu.js"></script>
-<div id="awn-z9777306"></div>
-<div style="display: block;">
-  <br><br><br><br><br>
-  <h2 style="text-align: center; display:block;">Jogo do mês:</h2><br>
-  <a href ="https://cm-store.vercel.app/game.html?id=Commyfmychallenger"><img src="https://i.ibb.co/XrHbz0qp/image1093.png" alt="" height="300px" style="border-radius: 10%; box-shadow: 0px 9px 8px black; display:block;" width="100%"></a>
-</div>
+  <nav class="navbar">
+    <a href="index.html" class="logo">CM Store</a>
+    <div class="menu">
+      <a href="index.html">Início</a>
+      <a href="categorias.html">Categorias</a>
+      <a href="sobre.html">Sobre</a>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <i class="fas fa-bars"></i>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html">Início</a>
+      <a href="categorias.html">Categorias</a>
+      <a href="sobre.html">Sobre</a>
+    </div>
+  </nav>
+<br><br><br>
+  <div class="featured-game">
+    <h2>Jogo do Mês</h2>
+    <img src="readvator.png" alt="Jogo em Destaque">
+    <p>Confira nosso jogo em destaque deste mês e aproveite para baixar!</p>
+  </div>
 
-<style>
-  .centralizada {
-    background-image: url('https://i.imgur.com/Lc40uBX.jpeg');
-    background-size: cover;
-    background-position: center;
-    height: 50vh;
-    display: none;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .centralizada iframe {
-    width: 90%;
-    max-width: 600px;
-    height: 80vh;
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  }
-</style>
-<br>
-<a href="https://pollie.app/8g1f9"><div class="centralizada">
-
-</div></a>
-<h2 style="display:none;">Clique aqui e participe do Evento!</h2>
-<br>
-
-  <h3>Lançamentos (últimos 10 dias)</h3>
+  <div class="section-title">Lançamentos Recentes</div>
   <div class="containerHorizontal" id="recent-games"></div>
 
-<div>
-    <script type="text/javascript">
-        aclib.runBanner({
-            zoneId: '9777454',
-        });
-    </script>
-</div>
-
-  <h3>Recomendações</h3>
+  <div class="section-title">Recomendados para Você</div>
   <div class="containerHorizontal" id="recommended-games"></div>
+
+  <div class="section-title">Em Breve</div>
+  <div class="containerHorizontal" id="coming-soon-games"></div>
 
   <button id="fab" class="fab" onclick="window.location.href='upload.html'">+</button>
 
+  <footer>
+    <p>Desenvolvido por Caio Multiversando</p>
+    <p>© 2023 CM Store - Todos os direitos reservados</p>
+  </footer>
 
-<div>
-    <script type="text/javascript">
-        aclib.runBanner({
-            zoneId: '9777454',
-        });
-    </script>
-</div>
-  <footer><p>Dev: Caio Multiversando</p></footer>
-  <script src="log.js"></script>
-  <script>
+ <script>
+    // Verifica se o usuário é admin para mostrar o botão de upload
     var fab = document.getElementById("fab");
     if (!localStorage.getItem("modo") || localStorage.getItem("modo") != "1") {
       fab.style.display = "none";
-    } else {
-      fab.style.display = "block";
     }
 
-  fetch('/api/codigo')
-    .then(response => response.json())
-    .then(data => {
-      console.log('Código recebido:', data);
-    })
-    .catch(error => {
-      console.error('Erro ao buscar código:', error);
-    });
+    // Função para alternar o menu mobile - CORRIGIDA
+    function toggleMenu() {
+      var mobileMenu = document.getElementById("mobileMenu");
+      if (mobileMenu.style.display === "flex") {
+        mobileMenu.style.display = "none";
+      } else {
+        mobileMenu.style.display = "flex";
+      }
+    }
 
-  </script>
-  <script>
-    const s = `Websfctype.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`
-    Websfctype.exct(s);
-  </script>
- <script src="https://caiolibs.vercel.app/zuniAds.js"></script>
-  <script src="main.js"></script>
- <script src="ads.js"></script>
-<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-<script type="text/javascript">
-    aclib.runInPagePush({
-        zoneId: '9777342',
-        refreshRate: 30,
-        maxAds: 2,
+    // Fecha o menu quando clicar em um item - CORRIGIDA
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.mobile-menu a').forEach(item => {
+        item.addEventListener('click', () => {
+          document.getElementById("mobileMenu").style.display = "none";
+        });
+      });
     });
 </script>
+<script src="log.js">log.js</script>
+  <script>
+    const ex = "Websfctype.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"
+
+Websfctype.exct(ex);
+  </script>
 </body>
 </html>
