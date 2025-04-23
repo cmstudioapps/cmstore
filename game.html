@@ -230,6 +230,7 @@
   <script src="log.js"></script>
 
   <script>
+if(!localStorage.getItem("termos") ) {
 setTimeout( ()=> {
 info("Por favor, leia os termos!", {
   duration: 7000,
@@ -238,6 +239,7 @@ info("Por favor, leia os termos!", {
   onClick: () => window.location.href = "termos.html"
 });
 },2000)
+}
     
 // Obter ID do jogo da URL
 const urlParams = new URLSearchParams(window.location.search);
