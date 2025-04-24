@@ -1,0 +1,1 @@
+const i = localStorage.getItem("idUser") || "Não definido"
