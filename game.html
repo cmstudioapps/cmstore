@@ -163,10 +163,9 @@
       cursor: not-allowed;
     }
 
-        .screenshots-container {
+    .screenshots-container {
       display: flex;
       overflow-x: auto;
-      
       margin-top: 15px;
     }
 
@@ -197,6 +196,74 @@
     .age-rating.14 { background-color: #FF9800; }
     .age-rating.16 { background-color: #F44336; }
     .age-rating.18 { background-color: #D32F2F; }
+
+    /* Novos estilos para jogos do mesmo desenvolvedor */
+    .more-games-container {
+      margin: 30px 0;
+    }
+
+    .more-games-title {
+      font-size: 1.4em;
+      margin-bottom: 15px;
+      color: #FFA000;
+      border-bottom: 2px solid #FFA000;
+      padding-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .verified-badge {
+      color: #4CAF50;
+      font-size: 1.2em;
+      display: none; /* Inicialmente escondido */
+    }
+
+    .games-scroll {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding: 10px 0;
+    }
+
+    .game-card {
+      min-width: 150px;
+      background-color: #006373;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .game-card-img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .game-card-info {
+      padding: 10px;
+    }
+
+    .game-card-title {
+      font-size: 0.9em;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .game-card-dev {
+      font-size: 0.8em;
+      color: #f0f0f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     @media (max-width: 768px) {
       .game-header {
@@ -240,7 +307,7 @@ info("Por favor, leia os termos!", {
 });
 },2000)
 }
-    
+
 // Obter ID do jogo da URL
 const urlParams = new URLSearchParams(window.location.search);
 const gameId = urlParams.get('id');
@@ -292,19 +359,19 @@ db.ref('jogos/' + gameId).once('value').then(snapshot => {
   const gameDeveloper = createElement('p', { class: 'game-developer' }, `Desenvolvedor: ${game.dev || 'Não especificado'}`);
 
   const gameMeta = createElement('div', { class: 'game-meta' });
-  
+
   // Gênero
   if (game.genero) {
     const genreMeta = createElement('span', { class: 'game-meta-item' }, game.genero.charAt(0).toUpperCase() + game.genero.slice(1));
     gameMeta.appendChild(genreMeta);
   }
-  
+
   // Versão (só mostra se existir e não for anúncio)
   if (game.versao && game.link) {
     const versionMeta = createElement('span', { class: 'game-meta-item' }, `Versão: ${game.versao}`);
     gameMeta.appendChild(versionMeta);
   }
-  
+
   // Classificação indicativa
   if (game.classificacao) {
     const ratingMeta = createElement('span', { class: 'game-meta-item' });
@@ -313,7 +380,7 @@ db.ref('jogos/' + gameId).once('value').then(snapshot => {
     ratingMeta.appendChild(ratingSpan);
     gameMeta.appendChild(ratingMeta);
   }
-  
+
   // Tamanho (para jogos antigos)
   if (game.tamanho) {
     const sizeMeta = createElement('span', { class: 'game-meta-item' }, `Tamanho: ${game.tamanho}`);
@@ -337,9 +404,9 @@ db.ref('jogos/' + gameId).once('value').then(snapshot => {
   if (game.prints && game.prints.length > 0) {
     const screenshotsSection = createElement('div', { class: 'game-section' });
     const screenshotsTitle = createElement('h3', { class: 'game-section-title' }, 'Imagens do Jogo');
-    
+
     const screenshotsContainer = createElement('div', { class: 'screenshots-container' });
-    
+
     game.prints.slice(0, 3).forEach(print => {
       const screenshot = createElement('img', {
         class: 'screenshot',
@@ -349,7 +416,7 @@ db.ref('jogos/' + gameId).once('value').then(snapshot => {
       });
       screenshotsContainer.appendChild(screenshot);
     });
-    
+
     screenshotsSection.append(screenshotsTitle, screenshotsContainer);
     container.appendChild(screenshotsSection);
   }
@@ -385,6 +452,73 @@ db.ref('jogos/' + gameId).once('value').then(snapshot => {
       class: 'download-btn disabled'
     }, 'EM BREVE');
     container.appendChild(downloadBtn);
+  }
+
+  // Seção de mais jogos do mesmo desenvolvedor (se tiver idUser)
+  if (game.idUser) {
+    const moreGamesSection = createElement('div', { class: 'more-games-container' });
+    
+    // Criar título com possibilidade de badge verificado
+    const moreGamesTitle = createElement('h3', { class: 'more-games-title' });
+    moreGamesTitle.textContent = 'Mais jogos deste desenvolvedor';
+    
+    // Criar badge verificado (inicialmente escondido)
+    const verifiedBadge = createElement('i', { 
+      class: 'fas fa-check-circle verified-badge',
+      title: 'Arquivo confiável'
+    });
+    gameTitle.appendChild(verifiedBadge);
+    
+    const gamesScroll = createElement('div', { class: 'games-scroll' });
+    
+    // Carregar lista de desenvolvedores verificados
+    db.ref('vv').once('value').then(vvSnapshot => {
+      const verifiedUsers = vvSnapshot.val() || {};
+      
+      // Verificar se o idUser está na lista de verificados
+      if (verifiedUsers[game.idUser]) {
+        verifiedBadge.style.display = 'inline-block';
+      }
+      
+      // Carregar outros jogos do mesmo desenvolvedor
+      db.ref('jogos').orderByChild('idUser').equalTo(game.idUser).once('value').then(gamesSnapshot => {
+        const games = gamesSnapshot.val() || {};
+        
+        // Filtrar o jogo atual e limitar a 10 jogos
+        Object.entries(games).forEach(([id, gameData]) => {
+          if (id !== gameId && gamesScroll.children.length < 10) {
+            const gameCard = createElement('a', {
+              class: 'game-card',
+              href: `game.html?id=${id}`
+            });
+            
+            const gameCardImg = createElement('img', {
+              class: 'game-card-img',
+              src: gameData.icone || 'https://via.placeholder.com/150',
+              alt: gameData.nome || 'Jogo sem nome',
+              onerror: "this.src='https://via.placeholder.com/150'"
+            });
+            
+            const gameCardInfo = createElement('div', { class: 'game-card-info' });
+            const gameCardTitle = createElement('div', { class: 'game-card-title' }, gameData.nome || 'Jogo sem nome');
+            const gameCardDev = createElement('div', { class: 'game-card-dev' }, gameData.dev || 'Desenvolvedor desconhecido');
+            
+            gameCardInfo.append(gameCardTitle, gameCardDev);
+            gameCard.append(gameCardImg, gameCardInfo);
+            gamesScroll.appendChild(gameCard);
+          }
+        });
+        
+        // Se não houver outros jogos, mostrar mensagem
+        if (gamesScroll.children.length === 0) {
+          const noGamesMsg = createElement('p', {}, 'Nenhum outro jogo encontrado deste desenvolvedor.');
+          gamesScroll.appendChild(noGamesMsg);
+        }
+      });
+    });
+    
+    moreGamesSection.append(moreGamesTitle, gamesScroll);
+    container.appendChild(moreGamesSection);
   }
 
   // Seção de comentários
