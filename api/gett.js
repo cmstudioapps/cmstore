@@ -1,0 +1,1 @@
+/*Tratando requisição get como se fosse um envio de dados*/
