@@ -1,7 +1,7 @@
 export default function handler (req, res) {
 
 const {sala} = req.query 
-
+const url = "https://palavras-22e2c-default-rtdb.firebaseio.com/"
 fetch (url+sala+"/.json")
 .then(data => response.js))
 .then(data => {
