@@ -9,7 +9,7 @@ fetch (url+sala+"/.json")
  let msg = data.msg
  let nome = data.nome
 
- res.status(200).send(`${nome}: nome `)
+ res.status(200).send(`${nome}: ${msg}`)
 
 }).catch (error => {
  res.status(400).send("ouve um erro ao tentar ler")
