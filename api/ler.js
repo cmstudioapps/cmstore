@@ -6,8 +6,8 @@ fetch (url+sala+"/.json")
 .then(response => response.json())
 .then(data => {
 
- let msg = data.msg
- let nome = data.nome
+ let msg = data.msg.toString()
+ let nome = data.nome.toString()
 
  res.status(200).send(`${nome}: ${msg}`)
 
