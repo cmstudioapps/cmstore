@@ -3,7 +3,7 @@ export default function handler (req, res) {
 const {sala} = req.query 
 const url = "https://palavras-22e2c-default-rtdb.firebaseio.com/"
 fetch (url+sala+"/.json")
-.then(data => response.js))
+.then(response => response.js))
 .then(data => {
 
  let msg = data.msg
@@ -11,7 +11,7 @@ fetch (url+sala+"/.json")
 
  res.status(200).send(`${nome}: nome `)
 
-}).catch (error => ({
+}).catch (error => {
  res.status(400).send("ouve um erro ao tentar ler")
 })
 
