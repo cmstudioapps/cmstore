@@ -1,6 +1,6 @@
 export default function handler (req, res) {
 
-const {tipo, nome, msg} = req.query
+const {tipo, nome, msg, sala} = req.query
 const url = "https://palavras-22e2c-default-rtdb.firebaseio.com/"
 
 const dados = {
@@ -9,7 +9,7 @@ msg
 }
 if(tipo === "enviar") {
 
- fetch(`${url}${sala}.json`, {
+ fetch(`${url}${sala}/.json`, {
 
 method: "PATCH",
 headers: {"Content-Type": "application/json"},
