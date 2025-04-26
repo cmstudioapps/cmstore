@@ -7,23 +7,22 @@ export default async function handler(req, res) {
     const [data, horaCompleta] = dados.datetime.split('T');
     const hora = horaCompleta.split('.')[0]; // Remove milissegundos
 
-    // Função para formatar a data no formato brasileiro (dd/mm/aaaa)
-    const formatarDataBrasil = (dataISO) => {
-      const [ano, mes, dia] = dataISO.split('-');
-      return `${dia}/${mes}/${ano}`;
-    };
+    // Extrair valores numéricos
+    const [ano, mes, dia] = data.split('-');
+    const [horaNumerica, minuto, segundo] = hora.split(':');
 
-    // Informações disponíveis (com nomes em português)
+    // Dia da semana: 0 (domingo) a 6 (sábado)
+    const diaDaSemana = dados.day_of_week;
+
+    // Informações numéricas específicas
     const tudo = {
-      "data_completa": dados.datetime,
-      "apenas_data": data,
-      "apenas_data_br": formatarDataBrasil(data), // Data no formato brasileiro
-      "apenas_hora": hora,
-      "dia_da_semana": dados.day_of_week,
-      "dia_do_ano": dados.day_of_year,
-      "fuso_horario": dados.timezone,
-      "diferenca_utc": dados.utc_offset,
-      "semana_do_ano": dados.week_number
+      "dia": dia,               // Dia do mês
+      "mes": mes,               // Mês (01 a 12)
+      "ano": ano,               // Ano
+      "hora": horaNumerica,     // Hora (00 a 23)
+      "minuto": minuto,         // Minuto (00 a 59)
+      "segundo": segundo,       // Segundo (00 a 59)
+      "dia_da_semana": diaDaSemana // Dia da semana (0 a 6)
     };
 
     // Pegar o parâmetro "dados" da URL
