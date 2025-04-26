@@ -32,33 +32,28 @@ export default async function handler(req, res) {
     // Se o Dev pedir dados específicos
     if (parametros) {
       const chavesPedidas = parametros.split(',').map(item => item.trim());
-      const respostaFiltrada = {};
-      const chavesInvalidas = [];
-
-      chavesPedidas.forEach(chave => {
+      
+      // Verifica se as chaves existem e retorna o valor
+      const respostaFiltrada = chavesPedidas.map(chave => {
         if (tudo[chave] !== undefined) {
-          respostaFiltrada[chave] = tudo[chave];
-        } else {
-          chavesInvalidas.push(chave);
+          return tudo[chave];
         }
-      });
+        return null; // Se a chave não existir, retorna null
+      }).filter(valor => valor !== null); // Remove valores null (caso a chave não exista)
 
-      if (chavesInvalidas.length > 0) {
-        return res.status(400).json({
-          erro: `Os seguintes dados não existem: ${chavesInvalidas.join(', ')}.`,
-          dicas: "Use apenas: data_completa, apenas_data, apenas_data_br, apenas_hora, dia_da_semana, dia_do_ano, fuso_horario, diferenca_utc, semana_do_ano."
-        });
+      // Se não encontrar nada válido
+      if (respostaFiltrada.length === 0) {
+        return res.status(400).send('Dados não encontrados.');
       }
 
-      return res.status(200).json(respostaFiltrada);
+      // Retorna o valor pedido
+      return res.status(200).send(respostaFiltrada.join(' ')); // Retorna os valores juntos, separados por espaço
     }
 
-    // Se não pediu nada específico, retorna tudo
-    return res.status(200).json(tudo);
+    // Se não pedir nada específico, retorna erro
+    return res.status(400).send('Nenhum dado solicitado.');
 
   } catch (erro) {
-    return res.status(500).json({
-      erro: 'Não foi possível obter as informações de horário.'
-    });
+    return res.status(500).send('Erro ao obter as informações de horário.');
   }
 }
