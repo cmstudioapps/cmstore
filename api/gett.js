@@ -4,7 +4,7 @@
 export default function handler(req, res) {
 
 const {acao, valor} = req.query
-
+const userAgent = req.headers['user-agent'];
 if(acao === "salvar") {
 
 res.status(200).json({
