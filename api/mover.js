@@ -34,7 +34,7 @@ export default function handler(req, res) {
   } else if (ver === "false") {
     // Lógica para enviar dados ao Firebase
     fetch(url + sala + "/.json", {
-      method: "PUT", // Substitui os dados existentes no nó
+      method: "PATCH", // Substitui os dados existentes no nó
       headers: {
         "Content-Type": "application/json",
       },
