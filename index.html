@@ -321,6 +321,19 @@
         });
       });
     });
+
+if(!localStorage.getItem("idUser")) {
+
+gerarID()
+
+}
+
+function gerarID() {
+  const timestamp = Date.now().toString().slice(-5);
+  const aleatorio = Math.floor(Math.random() * 90000 + 10000);
+  const id = timestamp + aleatorio;
+  localStorage.setItem('idUser', id);
+}
 </script>
 <script src="log.js">log.js</script>
   <script>
