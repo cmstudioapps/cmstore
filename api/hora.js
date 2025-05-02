@@ -1,5 +1,5 @@
-// Se estiver em Node.js puro (não Next.js), descomente:
-// const fetch = require('node-fetch');
+// Se estiver em Node.js puro (não Next.js), descomente
+const fetch = require('node-fetch');
 
 export default async function handler(req, res) {
   // Configurações
