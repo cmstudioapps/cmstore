@@ -8,19 +8,19 @@ const mes = data.getMonth()
 const ano = data.getFullYear()
 
 
-if(data === "dia") {
+if(dataTime === "dia") {
 
 res.status(200).send(dia)
 
 
 }
-if(data === "mes") {
+if(dataTime === "mes") {
 
 res.status(200).send(mes)
 
 
 }
-if(data === "ano") {
+if(dataTime === "ano") {
 
 res.status(200).send(ano)
 
