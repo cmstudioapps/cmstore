@@ -1,6 +1,6 @@
 export default function handler (req, res) {
 
-const { data } = req.query 
+const { dataTime } = req.query 
 
 const data = new Date()
 const dia = data.getDate()
