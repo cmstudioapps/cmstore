@@ -18,8 +18,6 @@ export default function handler(req, res) {
     return res.status(200).send(ano.toString());
   }
 
-  // Se não for nenhum dos casos acima:
-  if (!dataTime || !["dia", "mes", "ano"].includes(dataTime)) {
-    return res.status(200).send("sem resposta");
-  }
+  // Se não for nenhum valor conhecido
+  return res.status(200).send("sem resposta");
 }
