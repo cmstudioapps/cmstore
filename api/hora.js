@@ -27,5 +27,11 @@ res.status(200).send(ano)
 
 }
 
+if(!dataTime && !dataTime.includes("dia","mes","ano") {
+
+res.status(200).send("sem resposta")
+
+}
+
 
 }
