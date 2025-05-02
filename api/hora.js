@@ -1,58 +1,60 @@
 export default async function handler(req, res) {
   try {
-    const resposta = await fetch('https://worldtimeapi.org/api/ip');
-    const dados = await resposta.json();
+    // Configura o fuso horário padrão (Brasília) se não for especificado
+    const timeZone = req.query.timezone || 'America/Sao_Paulo';
+    const timeApiUrl = `https://timeapi.io/api/Time/current/zone?timeZone=${encodeURIComponent(timeZone)}`;
 
-    // Separar data e hora
-    const [data, horaCompleta] = dados.datetime.split('T');
-    const hora = horaCompleta.split('.')[0]; // Remove milissegundos
+    // Faz a requisição à TimeAPI
+    const resposta = await fetch(timeApiUrl, {
+      headers: { 'Accept': 'application/json' }, // Garante que a resposta seja JSON
+    });
 
-    // Extrair valores numéricos
-    const [ano, mes, dia] = data.split('-');
-    const [horaNumerica, minuto, segundo] = hora.split(':');
-
-    // Dia da semana: 0 (domingo) a 6 (sábado)
-    const diaDaSemana = dados.day_of_week;
-
-    // Informações numéricas específicas
-    const tudo = {
-      "dia": dia,               // Dia do mês
-      "mes": mes,               // Mês (01 a 12)
-      "ano": ano,               // Ano
-      "hora": horaNumerica,     // Hora (00 a 23)
-      "minuto": minuto,         // Minuto (00 a 59)
-      "segundo": segundo,       // Segundo (00 a 59)
-      "dia_da_semana": diaDaSemana // Dia da semana (0 a 6)
-    };
-
-    // Pegar o parâmetro "dados" da URL
-    const { dados: parametros } = req.query;
-
-    // Se o Dev pedir dados específicos
-    if (parametros) {
-      const chavesPedidas = parametros.split(',').map(item => item.trim());
-      
-      // Verifica se as chaves existem e retorna o valor
-      const respostaFiltrada = chavesPedidas.map(chave => {
-        if (tudo[chave] !== undefined) {
-          return tudo[chave];
-        }
-        return null; // Se a chave não existir, retorna null
-      }).filter(valor => valor !== null); // Remove valores null (caso a chave não exista)
-
-      // Se não encontrar nada válido
-      if (respostaFiltrada.length === 0) {
-        return res.status(400).send('Dados não encontrados.');
-      }
-
-      // Retorna o valor pedido
-      return res.status(200).send(respostaFiltrada.join(' ')); // Retorna os valores juntos, separados por espaço
+    if (!resposta.ok) {
+      throw new Error(`TimeAPI retornou erro: ${resposta.status} - ${resposta.statusText}`);
     }
 
-    // Se não pedir nada específico, retorna erro
-    return res.status(400).send('Nenhum dado solicitado.');
+    const dados = await resposta.json();
+
+    // Formata os dados para o padrão esperado
+    const tudo = {
+      "dia": String(dados.day).padStart(2, '0'),       // Ex: "03" (dia)
+      "mes": String(dados.month).padStart(2, '0'),     // Ex: "05" (mês)
+      "ano": dados.year,                               // Ex: 2025
+      "hora": String(dados.hour).padStart(2, '0'),     // Ex: "15" (hora)
+      "minuto": String(dados.minute).padStart(2, '0'), // Ex: "30" (minuto)
+      "segundo": String(dados.seconds).padStart(2, '0'), // Ex: "22" (segundo)
+      "dia_da_semana": getDiaDaSemanaNumerico(dados.dayOfWeek) // 0 (Domingo) a 6 (Sábado)
+    };
+
+    // Se o usuário pedir dados específicos (ex: ?dados=hora,minuto)
+    if (req.query.dados) {
+      const camposRequisitados = req.query.dados.split(',').map(campo => campo.trim());
+      const resultadoFiltrado = camposRequisitados
+        .filter(campo => tudo[campo] !== undefined)
+        .map(campo => tudo[campo]);
+
+      if (resultadoFiltrado.length === 0) {
+        return res.status(400).json({ erro: "Campos inválidos solicitados." });
+      }
+
+      // Retorna os valores separados por espaço (ex: "15 30")
+      return res.status(200).send(resultadoFiltrado.join(' '));
+    }
+
+    // Retorna todos os dados se nenhum filtro for aplicado
+    return res.status(200).json(tudo);
 
   } catch (erro) {
-    return res.status(500).send('Erro ao obter as informações de horário.');
+    console.error('Erro na API de horário:', erro);
+    return res.status(500).json({ 
+      erro: "Falha ao obter horário",
+      detalhes: erro.message 
+    });
   }
+}
+
+// Helper: Converte dia da semana (string) para número (0-6)
+function getDiaDaSemanaNumerico(diaSemanaString) {
+  const dias = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return dias.indexOf(diaSemanaString); // Retorna 0 (Domingo) a 6 (Sábado)
 }
