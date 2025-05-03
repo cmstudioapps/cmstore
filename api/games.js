@@ -1,5 +1,8 @@
 // api/games.js
 export default function handler(req, res) {
+
+res.setHeader('Access-Control-Allow-Origin', 'https://cm-store.vercel.app');
+
   const firebaseUrl = "https://jogos-a1a46-default-rtdb.firebaseio.com/jogos";
   const { games, gameId } = req.query;
 
