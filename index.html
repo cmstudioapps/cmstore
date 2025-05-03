@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<script src="nm.js"></script >
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CM Store</title>
+  <title>CM Store - Em Manutenção</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://websfctype.vercel.app/Websfctype/Websfctype-main-@version104.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Roboto', sans-serif; background-color: #002B36; color: #FFFFFF; }
+    body { 
+      font-family: 'Roboto', sans-serif; 
+      background-color: #002B36; 
+      color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
     .navbar {
       background-color: #003C4C;
@@ -22,208 +23,84 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      left: 0;
-      z-index: 1000;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
 
-    .menu { display: flex; gap: 20px; }
-    .menu a { text-decoration: none; color: #FFFFFF; font-weight: 500; }
-    .hamburger { display: none; font-size: 1.5em; cursor: pointer; }
-    .mobile-menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      width: 200px;
-      background-color: #003C4C;
-      flex-direction: column;
-      border-radius: 5px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      z-index: 1001;
+    .logo {
+      color: white;
+      font-weight: bold;
+      font-size: 1.5em;
     }
 
-    .mobile-menu a {
-      padding: 12px 15px;
-      text-decoration: none;
-      color: #FFFFFF;
-      display: block;
-      border-bottom: 1px solid #004F5F;
-    }
-
-    .mobile-menu a:hover {
-      background-color: #004F5F;
-    }
-
-    h2, h3 { 
-      text-align: center; 
-      margin: 20px 0 10px;
-      color: #FFA000;
-    }
-
-    .section-title {
-      font-size: 1.8em;
-      margin: 100px 0 20px;
-      text-align: center;
-      position: relative;
-    }
-
-    .section-title:after {
-      content: "";
-      display: block;
-      width: 100px;
-      height: 3px;
-      background: #FFA000;
-      margin: 10px auto;
-    }
-
-    .containerHorizontal {
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 20px;
-      overflow-x: auto;
+    .maintenance-container {
+      flex: 1;
       display: flex;
-      gap: 20px;
-      flex-wrap: nowrap;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-    }
-
-    .containerHorizontal::-webkit-scrollbar {
-      display: none;
-    }
-
-    .game-card {
-      background: linear-gradient(135deg, #004F5F, #006373);
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      width: 280px;
-      padding: 15px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-      flex-shrink: 0;
-      scroll-snap-align: start;
-      position: relative;
+      padding: 20px;
+    }
+
+    .maintenance-icon {
+      font-size: 5em;
+      color: #FFA000;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    h1 {
+      color: #FFA000;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2em;
+      max-width: 600px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .progress-container {
+      width: 80%;
+      max-width: 500px;
+      height: 20px;
+      background-color: #004F5F;
+      border-radius: 10px;
+      margin: 20px 0;
       overflow: hidden;
     }
 
-    .game-card:hover { 
-      transform: translateY(-5px);
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    .progress-bar {
+      height: 100%;
+      width: 65%;
+      background: linear-gradient(90deg, #FFA000, #FF6F00);
+      border-radius: 10px;
+      animation: progress 2s ease-in-out infinite;
     }
 
-    .game-card.coming-soon {
-      border: 2px solid #FFA000;
-    }
-
-    .coming-soon-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #FFA000;
-      color: #002B36;
-      padding: 3px 8px;
-      border-radius: 15px;
-      font-size: 0.8em;
-      font-weight: bold;
-    }
-
-    .game-icon { 
-      width: 100px; 
-      height: 100px; 
-      border-radius: 20px; 
-      object-fit: cover; 
-      margin-bottom: 15px; 
-      border: 3px solid #FFA000;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-
-    .game-title { 
-      font-size: 1.3em; 
-      font-weight: 700; 
-      margin-bottom: 8px; 
-      color: #FFFFFF;
-    }
-
-    .game-genre {
-      font-size: 0.9em;
-      color: #FFA000;
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
-
-    .game-description { 
-      font-size: 0.9em; 
-      margin-bottom: 15px; 
-      color: #f0f0f0; 
-      line-height: 1.5;
-    }
-
-    .game-version {
-      font-size: 0.8em;
-      color: #BDBDBD;
-      margin-bottom: 10px;
-    }
-
-    .featured-game {
-      max-width: 800px;
-      margin: 30px auto;
-      text-align: center;
-      padding: 0 20px;
-    }
-
-    .featured-game img {
-      width: 100%;
-      max-width: 400px;
-      border-radius: 15px;
-      box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-      border: 3px solid #FFA000;
-    }
-
-    .featured-game h2 {
-      margin: 15px 0;
-      font-size: 2em;
-    }
-
-    .featured-game p {
-      max-width: 600px;
-      margin: 0 auto 20px;
-      line-height: 1.6;
-    }
-
-    .fab {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #FFA000, #FF6F00);
-      border: none;
-      border-radius: 50%;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      color: #FFFFFF;
-      font-size: 1.5em;
-      cursor: pointer;
+    .social-links {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .social-links a {
+      color: white;
+      font-size: 1.5em;
       transition: transform 0.3s;
     }
 
-    .fab:hover { 
-      transform: scale(1.1);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    .social-links a:hover {
+      color: #FFA000;
+      transform: translateY(-5px);
     }
 
     footer { 
       background-color: #003C4C; 
       text-align: center; 
       padding: 20px; 
-      margin-top: 50px;
     }
 
     footer p { 
@@ -231,117 +108,64 @@
       font-size: 0.9em;
     }
 
-    @media (max-width: 768px) {
-      .menu { display: none; }
-      .hamburger { display: block; }
-      
-      .section-title {
-        margin-top: 80px;
-        font-size: 1.5em;
-      }
-      
-      .game-card {
-        width: 250px;
-      }
-      
-      .featured-game img {
-        max-width: 300px;
-      }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+      40% {transform: translateY(-20px);}
+      60% {transform: translateY(-10px);}
     }
-    .logo {
+
+    @keyframes progress {
+      0% { width: 10%; }
+      50% { width: 70%; }
+      100% { width: 65%; }
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8em;
+      }
       
-      color: white ;
-      font-weight: bold;
+      p {
+        font-size: 1em;
+      }
       
+      .maintenance-icon {
+        font-size: 3em;
+      }
     }
   </style>
 </head>
 <body>
   <nav class="navbar">
-    <a href="index.html" class="logo">CM Store</a>
-    <div class="menu">
-      <a href="index.html">Início</a>
-      <a href="categorias.html">Categorias</a>
-      <a href="sobre.html">Sobre</a>
-    </div>
-    <div class="hamburger" onclick="toggleMenu()">
-      <i class="fas fa-bars"></i>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="index.html">Início</a>
-      <a href="config.html">Configurações</a>
-      <a href="evento.html">Evento</a>
-    </div>
+    <div class="logo">CM Store</div>
   </nav>
-<br><br><br>
-  <div class="featured-game">
-    <h2>Jogo do Mês</h2>
-   <a href="https://cm-store.vercel.app/game.html?id=Commyfmychallenger"><img src="https://i.ibb.co/XrHbz0qp/image1093.png" alt="Jogo em Destaque"></a>
-    <p>Confira nosso jogo em destaque deste mês e aproveite para baixar!</p>
+
+  <div class="maintenance-container">
+    <div class="maintenance-icon">
+      <i class="fas fa-tools"></i>
+    </div>
+    
+    <h1>Estamos fazendo alguns ajustes!</h1>
+    
+    <p>Nossos desenvolvedores estão trabalhando duro para trazer uma experiência de jogos ainda melhor para você. Enquanto isso, que tal dar uma olhada nas nossas redes sociais?</p>
+    
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+    </div>
+    
+    <p><strong>Progresso da manutenção:</strong> 10% completo</p>
+    <p>Voltaremos em breve com novidades incríveis para você!</p>
+    
+    <div class="social-links">
+      <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" title="Discord"><i class="fab fa-discord"></i></a>
+      <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+    </div>
   </div>
 
-  <div class="section-title">Lançamentos Recentes</div>
-  <div class="containerHorizontal" id="recent-games"></div>
-
-  <div class="section-title">Recomendados para Você</div>
-  <div class="containerHorizontal" id="recommended-games"></div>
-
-  <div class="section-title">Em Breve</div>
-  <div class="containerHorizontal" id="coming-soon-games"></div>
-
-  <button id="fab" class="fab" onclick="window.location.href='upload.html'">+</button>
-
   <footer>
-    <p>Desenvolvido por Caio Multiversando</p>
-    
+    <p>© 2023 CM Store - Todos os direitos reservados</p>
   </footer>
-<script src="ads.js"></script>
- <script>
-    // Verifica se o usuário é admin para mostrar o botão de upload
-    var fab = document.getElementById("fab");
-    if (!localStorage.getItem("modo") || localStorage.getItem("modo") != "1") {
-      fab.style.display = "none";
-    }
-
-    // Função para alternar o menu mobile - CORRIGIDA
-    function toggleMenu() {
-      var mobileMenu = document.getElementById("mobileMenu");
-      if (mobileMenu.style.display === "flex") {
-        mobileMenu.style.display = "none";
-      } else {
-        mobileMenu.style.display = "flex";
-      }
-    }
-
-    // Fecha o menu quando clicar em um item - CORRIGIDA
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.mobile-menu a').forEach(item => {
-        item.addEventListener('click', () => {
-          document.getElementById("mobileMenu").style.display = "none";
-        });
-      });
-    });
-
-if(!localStorage.getItem("idUser")) {
-
-gerarID()
-
-}
-
-function gerarID() {
-  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let id = '';
-  for (let i = 0; i < 10; i++) {
-    id += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-  }
-  localStorage.setItem('idUser', id);
-}
-</script>
-<script src="log.js">log.js</script>
-  <script>
-    const ex = "Websfctype.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"
-
-Websfctype.exct(ex);
-  </script>
 </body>
 </html>
