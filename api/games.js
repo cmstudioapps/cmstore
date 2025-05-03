@@ -1,5 +1,6 @@
 export default function handler (req, res) {
-
+res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Methods', 'GET');
 const url = "https://jogos-a1a46-default-rtdb.firebaseio.com/"
 const { games } = req.query 
 
