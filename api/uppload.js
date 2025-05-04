@@ -6,7 +6,7 @@ res.setHeader('Access-Control-Allow-Methods', '*');
 res.setHeader('Access-Control-Allow-Headers', '*');
 
   // Chaves e URLs
-  const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
+  const IMGBB_API_KEY = process.env.IMGBB_API_KEY || "0863e0eee12396e6097628c10fdc5228"
   const FIREBASE_URL = process.env.FIREBASE_URL || "https://jogos-a1a46-default-rtdb.firebaseio.com";
 
   // Pré-flight CORS
