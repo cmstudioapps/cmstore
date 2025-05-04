@@ -1,1 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Envio - CM Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #002B36, #004F5F);
+      color: #FFFFFF;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      font-size: 2em;
+      letter-spacing: 1px;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(0, 60, 76, 0.9);
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .form-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(0, 40, 50, 0.5);
+      border-radius: 8px;
+    }
+
+    .form-section h2 {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      color: #FFA000;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-section h2 i {
+      margin-right: 10px;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin-top: 15px;
+      font-size: 1em;
+    }
+
+    .required:after {
+      content: " *";
+      color: #FF5252;
+    }
+
+    .input-group {
+      position: relative;
+      margin-top: 8px;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      padding: 12px;
+      padding-left: 40px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+      outline: none;
+      transition: 0.3s;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-group textarea {
+      resize: none;
+      height: 100px;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      box-shadow: 0 0 10px #FFA000;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #FFA000;
+      font-size: 1.2em;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .checkbox-group input {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .file-upload {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+
+    .file-upload-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .file-upload-item i {
+      margin-right: 10px;
+      color: #FFA000;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .preview-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 2px solid #FFA000;
+    }
+
+    .buttons-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      color: #FFFFFF;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: 0.3s;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button i {
+      margin-right: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #FFA000, #FF6F00);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.03);
+      background: linear-gradient(90deg, #FF6F00, #FFA000);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(90deg, #607D8B, #455A64);
+    }
+
+    .btn-secondary:hover {
+      transform: scale(1.03);
+      background: linear-gradient(90deg, #455A64, #607D8B);
+    }
+
+    .alert {
+      text-align: center;
+      font-size: 1em;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .success {
+      background-color: rgba(0, 230, 118, 0.2);
+      color: #00E676;
+      display: block;
+    }
+
+    .error {
+      background-color: rgba(255, 82, 82, 0.2);
+      color: #FF5252;
+      display: block;
+    }
+
+    .loading {
+      background-color: rgba(255, 160, 0, 0.2);
+      color: #FFA000;
+      display: block;
+    }
+
+    .status-indicator {
+      font-size: 0.9em;
+      margin-top: 5px;
+      color: #FFA000;
+    }
+
+    .age-rating {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .age-rating label {
+      display: flex;
+      align-items: center;
+      margin-top: 0;
+      padding: 5px 10px;
+      background: rgba(255, 160, 0, 0.2);
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .age-rating input {
+      margin-right: 5px;
+    }
+
+    .existing-media {
+      color: #FFA000;
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .existing-media i {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Painel de Envio de Jogos</h1>
+
+  <div class="form-container">
+    <div class="form-section">
+      <h2><i class="fas fa-info-circle"></i> Informações Básicas</h2>
+      
+      <label for="packageId" class="required">Package:</label>
+      <div class="input-group">
+        <i class="fas fa-box"></i>
+        <input type="text" id="packageId" placeholder="ex: com-mygame-myname">
+      </div>
+      <p class="status-indicator" id="package-status">Digite o package para verificar disponibilidade</p>
+
+      <label for="nome" class="required">Nome do Jogo:</label>
+      <div class="input-group">
+        <i class="fas fa-gamepad"></i>
+        <input type="text" id="nome" placeholder="Digite o nome do jogo">
+      </div>
+
+      <label for="descricao" class="required">Descrição:</label>
+      <div class="input-group">
+        <i class="fas fa-align-left"></i>
+        <textarea id="descricao" placeholder="Descreva o jogo"></textarea>
+      </div>
+
+      <label for="genero" class="required">Gênero do Jogo:</label>
+      <div class="input-group">
+        <i class="fas fa-tags"></i>
+        <select id="genero">
+          <option value="ação">Ação</option>
+          <option value="aventura">Aventura</option>
+          <option value="rpg">RPG</option>
+          <option value="corrida">Corrida</option>
+          <option value="esporte">Esporte</option>
+          <option value="estratégia">Estratégia</option>
+          <option value="simulação">Simulação</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+
+      <label>Classificação Indicativa:</label>
+      <div class="age-rating">
+        <label><input type="radio" name="classificacao" value="L" checked> Livre</label>
+        <label><input type="radio" name="classificacao" value="10"> 10+</label>
+        <label><input type="radio" name="classificacao" value="12"> 12+</label>
+        <label><input type="radio" name="classificacao" value="14"> 14+</label>
+        <label><input type="radio" name="classificacao" value="16"> 16+</label>
+        <label><input type="radio" name="classificacao" value="18"> 18+</label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2><i class="fas fa-images"></i> Mídia</h2>
+      
+      <label for="icone" class="required">Ícone (Imagem):</label>
+      <div class="file-upload">
+        <input type="file" id="icone" accept="image/*">
+        <div class="preview-container" id="icone-preview"></div>
+      </div>
+
+      <label>Prints do Jogo (Máx. 3):</label>
+      <div class="file-upload">
+        <input type="file" id="prints" accept="image/*" multiple>
+        <div class="preview-container" id="prints-preview"></div>
+      </div>
+
+      <label for="video">Link do Vídeo (YouTube):</label>
+      <div class="input-group">
+        <i class="fas fa-video"></i>
+        <input type="url" id="video" placeholder="https://www.youtube.com/...">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2><i class="fas fa-download"></i> Detalhes do Download</h2>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="anuncio" onchange="toggleDownloadFields()">
+        <label for="anuncio">Apenas anúncio (sem link de download)</label>
+      </div>
+
+      <div id="download-fields">
+        <label for="versao" class="required">Versão:</label>
+        <div class="input-group">
+          <i class="fas fa-code-branch"></i>
+          <input type="number" id="versao" placeholder="ex: 1.0..." step="0.1">
+        </div>
+
+        <label for="link" class="required">Link do Jogo (MediaFire):</label>
+        <div class="input-group">
+          <i class="fas fa-link"></i>
+          <input type="url" id="link" placeholder="https://www.mediafire.com/...">
+        </div>
+      </div>
+    </div>
+
+    <div class="buttons-container">
+      <button class="btn-primary" onclick="enviarJogo()">
+        <i class="fas fa-paper-plane"></i> Enviar Jogo
+      </button>
+      <button class="btn-secondary" onclick="limparCampos()">
+        <i class="fas fa-broom"></i> Limpar
+      </button>
+    </div>
+
+    <p class="alert" id="alerta"></p>
+  </div>
+
+<script>
+  // Variáveis globais
+  let iconFile = null;
+  let printFiles = [];
+  let isEditing = false;
+  let currentGameId = null;
+  let currentGameOwnerId = null;
+  let currentGameData = null;
+
+  // Configura os listeners para os uploads de imagens
+  document.addEventListener('DOMContentLoaded', function() {
+    // Listener para o packageId (verificação de jogo existente)
+    document.getElementById('packageId').addEventListener('change', function() {
+      verificarJogoExistente(this.value.trim());
+    });
+
+    // Listener para o ícone
+    document.getElementById('icone').addEventListener('change', function(e) {
+      if (e.target.files.length) {
+        iconFile = e.target.files[0];
+        showImagePreview(iconFile, 'icone-preview');
+      }
+    });
+
+    // Listener para os prints
+    document.getElementById('prints').addEventListener('change', function(e) {
+      if (e.target.files.length) {
+        // Limita a 3 imagens
+        printFiles = Array.from(e.target.files).slice(0, 3);
+        const previewContainer = document.getElementById('prints-preview');
+        previewContainer.innerHTML = '';
+        
+        printFiles.forEach((file, index) => {
+          showImagePreview(file, 'prints-preview');
+        });
+      }
+    });
+  });
+
+  // Função para verificar se o jogo já existe
+  async function verificarJogoExistente(packageId) {
+    if (!packageId) {
+      document.getElementById('package-status').textContent = 'Digite o package para verificar disponibilidade';
+      document.getElementById('package-status').style.color = '#FFA000';
+      isEditing = false;
+      currentGameId = null;
+      currentGameOwnerId = null;
+      currentGameData = null;
+      return;
+    }
+
+    const packageStatus = document.getElementById('package-status');
+    packageStatus.textContent = 'Verificando package...';
+    packageStatus.style.color = '#FFA000';
+
+    try {
+      const response = await fetch(`https://cm-store.vercel.app/api/games.js?gameId=${packageId}`);
+      
+      if (!response.ok) {
+        throw new Error('Erro na verificação');
+      }
+
+      const gameData = await response.json();
+
+      if (gameData.error && gameData.error === "Jogo não encontrado") {
+        // Package disponível
+        packageStatus.textContent = 'Package disponível para uso.';
+        packageStatus.style.color = '#4CAF50';
+        isEditing = false;
+        currentGameId = null;
+        currentGameOwnerId = null;
+        currentGameData = null;
+      } else if (gameData.idUser) {
+        // Jogo existe - verificar se pertence ao usuário atual
+        const currentUserId = localStorage.getItem('idUser');
+        currentGameData = gameData;
+        
+        if (gameData.idUser === currentUserId) {
+          // Modo edição - preencher campos
+          packageStatus.textContent = 'Jogo encontrado. Modo edição ativado.';
+          packageStatus.style.color = '#4CAF50';
+          preencherCamposEdicao(gameData);
+          isEditing = true;
+          currentGameId = packageId;
+          currentGameOwnerId = gameData.idUser;
+        } else {
+          // Package em uso por outro usuário
+          packageStatus.textContent = 'Este package já está em uso por outro desenvolvedor.';
+          packageStatus.style.color = '#FF5252';
+          isEditing = false;
+          currentGameId = null;
+          currentGameOwnerId = null;
+          currentGameData = null;
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar jogo:', error);
+      packageStatus.textContent = 'Erro ao verificar package. Tente novamente.';
+      packageStatus.style.color = '#FF5252';
+      isEditing = false;
+      currentGameId = null;
+      currentGameOwnerId = null;
+      currentGameData = null;
+    }
+  }
+
+  // Função para preencher os campos no modo edição
+  function preencherCamposEdicao(gameData) {
+    document.getElementById('nome').value = gameData.nome || '';
+    document.getElementById('descricao').value = gameData.descricao || '';
+    document.getElementById('genero').value = gameData.genero || 'ação';
+    document.getElementById('versao').value = gameData.versao || '';
+    document.getElementById('link').value = gameData.link || '';
+    document.getElementById('video').value = gameData.video || '';
+    
+    // Classificação indicativa
+    if (gameData.classificacao) {
+      const radio = document.querySelector(`input[name="classificacao"][value="${gameData.classificacao}"]`);
+      if (radio) radio.checked = true;
+    }
+    
+    // Verifica se é apenas anúncio
+    const isAnuncio = !gameData.link;
+    document.getElementById('anuncio').checked = isAnuncio;
+    toggleDownloadFields();
+    
+    // Carrega as imagens (apenas mostra que existem, não faz download)
+    if (gameData.icone) {
+      document.getElementById('icone-preview').innerHTML = `
+        <div class="existing-media">
+          <i class="fas fa-check-circle"></i>
+          Ícone já enviado anteriormente
+        </div>
+      `;
+    }
+    
+    if (gameData.prints && gameData.prints.length) {
+      document.getElementById('prints-preview').innerHTML = `
+        <div class="existing-media">
+          <i class="fas fa-check-circle"></i>
+          ${gameData.prints.length} print(s) já enviado(s)
+        </div>
+      `;
+    }
+  }
+
+  // Mostra prévia das imagens
+  function showImagePreview(file, containerId) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const previewContainer = document.getElementById(containerId);
+      if (containerId === 'icone-preview') {
+        previewContainer.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Prévia do ícone">`;
+      } else {
+        previewContainer.innerHTML += `<img src="${e.target.result}" class="preview-image" alt="Prévia do print">`;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function toggleDownloadFields() {
+    const downloadFields = document.getElementById('download-fields');
+    const isAnuncio = document.getElementById('anuncio').checked;
+    
+    if (isAnuncio) {
+      downloadFields.style.opacity = '0.5';
+      downloadFields.style.pointerEvents = 'none';
+      document.querySelectorAll('#download-fields .required').forEach(el => {
+        el.classList.remove('required');
+      });
+    } else {
+      downloadFields.style.opacity = '1';
+      downloadFields.style.pointerEvents = 'auto';
+      document.querySelectorAll('#download-fields label[for="versao"], #download-fields label[for="link"]').forEach(el => {
+        el.classList.add('required');
+      });
+    }
+  }
+
+  async function enviarJogo() {
+    const nome = document.getElementById('nome').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const genero = document.getElementById('genero').value;
+    const link = document.getElementById('link').value.trim();
+    const video = document.getElementById('video').value.trim();
+    const versao = document.getElementById('versao').value.trim();
+    const packageId = document.getElementById('packageId').value.trim();
+    const isAnuncio = document.getElementById('anuncio').checked;
+    const classificacao = document.querySelector('input[name="classificacao"]:checked').value;
+    const currentUserId = localStorage.getItem('idUser') || 'anonymous';
+    const dev = localStorage.getItem('nome') || 'Desenvolvedor Desconhecido';
+
+    // Validação básica
+    if (!nome || !descricao || !packageId || !genero) {
+      showAlert('Preencha todos os campos obrigatórios!', 'error');
+      return;
+    }
+
+    // Validação para downloads (se não for apenas anúncio)
+    if (!isAnuncio && (!versao || !link)) {
+      showAlert('Para enviar o jogo com download, preencha a versão e o link!', 'error');
+      return;
+    }
+
+    if (!isAnuncio && !link.includes('mediafire.com')) {
+      showAlert('O link deve ser do MediaFire!', 'error');
+      return;
+    }
+
+    if (!iconFile && (!isEditing || !currentGameData?.icone)) {
+      showAlert('Por favor, faça o upload do ícone!', 'error');
+      return;
+    }
+
+    // Verificação adicional para edição
+    if (isEditing && currentGameOwnerId !== currentUserId) {
+      showAlert('Você não tem permissão para editar este jogo!', 'error');
+      return;
+    }
+
+    showAlert('Preparando envio...', 'loading');
+
+    try {
+      // Preparar os dados do jogo
+      const gameData = {
+        idUser: currentUserId,
+        nome,
+        descricao,
+        genero,
+        versao: isAnuncio ? null : versao,
+        link: isAnuncio ? null : link,
+        dev,
+        packge: packageId,
+        video: video,
+        classificacao,
+        dataEnvio: new Date().toISOString(),
+        // Mantém os dados antigos se não forem substituídos
+        ...(isEditing && !iconFile ? { icone: currentGameData.icone } : {}),
+        ...(isEditing && printFiles.length === 0 ? { prints: currentGameData.prints } : {})
+      };
+
+      // Preparar imagens para upload (somente se forem novas)
+      const images = [];
+      
+      if (iconFile) {
+        const iconBase64 = await fileToBase64(iconFile);
+        images.push(`data:${iconFile.type};base64,${iconBase64}`);
+      }
+      
+      for (const file of printFiles) {
+        const printBase64 = await fileToBase64(file);
+        images.push(`data:${file.type};base64,${printBase64}`);
+      }
+
+      // Enviar para a API de upload
+      const response = await fetch('https://cm-store.vercel.app/api/uppload.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gameData,
+          images: images.length > 0 ? images : null,
+          packageId
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        showAlert(isEditing ? 'Jogo atualizado com sucesso!' : 'Jogo enviado com sucesso!', 'success');
+        setTimeout(() => {
+          window.location.href = `game.html?id=${packageId}`;
+        }, 1500);
+      } else {
+        throw new Error(result.error || 'Erro ao enviar o jogo');
+      }
+    } catch (error) {
+      console.error('Erro ao enviar jogo:', error);
+      showAlert(`Erro: ${error.message}`, 'error');
+    }
+  }
+
+  // Converte arquivo para base64
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  function showAlert(message, type) {
+    const alerta = document.getElementById('alerta');
+    alerta.textContent = message;
+    alerta.className = `alert ${type}`;
+  }
+
+  function limparCampos() {
+    document.getElementById('nome').value = '';
+    document.getElementById('descricao').value = '';
+    document.getElementById('icone').value = '';
+    document.getElementById('prints').value = '';
+    document.getElementById('link').value = '';
+    document.getElementById('video').value = '';
+    document.getElementById('versao').value = '';
+    document.getElementById('packageId').value = '';
+    document.getElementById('genero').value = 'ação';
+    document.querySelector('input[name="classificacao"][value="L"]').checked = true;
+    document.getElementById('anuncio').checked = false;
+    document.getElementById('icone-preview').innerHTML = '';
+    document.getElementById('prints-preview').innerHTML = '';
+    document.getElementById('package-status').textContent = 'Digite o package para verificar disponibilidade';
+    document.getElementById('package-status').style.color = '#FFA000';
+    toggleDownloadFields();
+    
+    iconFile = null;
+    printFiles = [];
+    isEditing = false;
+    currentGameId = null;
+    currentGameOwnerId = null;
+    currentGameData = null;
+    
+    showAlert('', ''); // Limpa o alerta
+  }
+</script>
+</body>
+</html>
