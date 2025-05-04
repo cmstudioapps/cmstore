@@ -374,334 +374,310 @@
   </div>
 
 <script>
-  // Variáveis globais
-  let iconFile = null;
-  let printFiles = [];
-  let isEditing = false;
-  let currentGameId = null;
-  let currentGameOwnerId = null;
-  let currentGameData = null;
+ let iconFile = null;
+let printFiles = [];
+let isEditing = false;
+let currentGameId = null;
+let currentGameOwnerId = null;
+let currentGameData = null;
 
-  // Configura os listeners para os uploads de imagens
-  document.addEventListener('DOMContentLoaded', function() {
-    // Listener para o packageId (verificação de jogo existente)
-    document.getElementById('packageId').addEventListener('change', function() {
-      verificarJogoExistente(this.value.trim());
-    });
-
-    // Listener para o ícone
-    document.getElementById('icone').addEventListener('change', function(e) {
-      if (e.target.files.length) {
-        iconFile = e.target.files[0];
-        showImagePreview(iconFile, 'icone-preview');
-      }
-    });
-
-    // Listener para os prints
-    document.getElementById('prints').addEventListener('change', function(e) {
-      if (e.target.files.length) {
-        // Limita a 3 imagens
-        printFiles = Array.from(e.target.files).slice(0, 3);
-        const previewContainer = document.getElementById('prints-preview');
-        previewContainer.innerHTML = '';
-        
-        printFiles.forEach((file, index) => {
-          showImagePreview(file, 'prints-preview');
-        });
-      }
-    });
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('packageId').addEventListener('change', function() {
+    verificarJogoExistente(this.value.trim());
   });
 
-  // Função para verificar se o jogo já existe
-  async function verificarJogoExistente(packageId) {
-    if (!packageId) {
-      document.getElementById('package-status').textContent = 'Digite o package para verificar disponibilidade';
-      document.getElementById('package-status').style.color = '#FFA000';
-      isEditing = false;
-      currentGameId = null;
-      currentGameOwnerId = null;
-      currentGameData = null;
-      return;
+  document.getElementById('icone').addEventListener('change', function(e) {
+    if (e.target.files.length) {
+      iconFile = e.target.files[0];
+      showImagePreview(iconFile, 'icone-preview');
     }
+  });
 
-    const packageStatus = document.getElementById('package-status');
-    packageStatus.textContent = 'Verificando package...';
-    packageStatus.style.color = '#FFA000';
-
-    try {
-      const response = await fetch(`https://cm-store.vercel.app/api/games.js?gameId=${packageId}`);
+  document.getElementById('prints').addEventListener('change', function(e) {
+    if (e.target.files.length) {
+      printFiles = Array.from(e.target.files).slice(0, 3);
+      const previewContainer = document.getElementById('prints-preview');
+      previewContainer.innerHTML = '';
       
-      if (!response.ok) {
-        throw new Error('Erro na verificação');
-      }
-
-      const gameData = await response.json();
-
-      if (gameData.error && gameData.error === "Jogo não encontrado") {
-        // Package disponível
-        packageStatus.textContent = 'Package disponível para uso.';
-        packageStatus.style.color = '#4CAF50';
-        isEditing = false;
-        currentGameId = null;
-        currentGameOwnerId = null;
-        currentGameData = null;
-      } else if (gameData.idUser) {
-        // Jogo existe - verificar se pertence ao usuário atual
-        const currentUserId = localStorage.getItem('idUser');
-        currentGameData = gameData;
-        
-        if (gameData.idUser === currentUserId) {
-          // Modo edição - preencher campos
-          packageStatus.textContent = 'Jogo encontrado. Modo edição ativado.';
-          packageStatus.style.color = '#4CAF50';
-          preencherCamposEdicao(gameData);
-          isEditing = true;
-          currentGameId = packageId;
-          currentGameOwnerId = gameData.idUser;
-        } else {
-          // Package em uso por outro usuário
-          packageStatus.textContent = 'Este package já está em uso por outro desenvolvedor.';
-          packageStatus.style.color = '#FF5252';
-          isEditing = false;
-          currentGameId = null;
-          currentGameOwnerId = null;
-          currentGameData = null;
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao verificar jogo:', error);
-      packageStatus.textContent = 'Erro ao verificar package. Tente novamente.';
-      packageStatus.style.color = '#FF5252';
-      isEditing = false;
-      currentGameId = null;
-      currentGameOwnerId = null;
-      currentGameData = null;
-    }
-  }
-
-  // Função para preencher os campos no modo edição
-  function preencherCamposEdicao(gameData) {
-    document.getElementById('nome').value = gameData.nome || '';
-    document.getElementById('descricao').value = gameData.descricao || '';
-    document.getElementById('genero').value = gameData.genero || 'ação';
-    document.getElementById('versao').value = gameData.versao || '';
-    document.getElementById('link').value = gameData.link || '';
-    document.getElementById('video').value = gameData.video || '';
-    
-    // Classificação indicativa
-    if (gameData.classificacao) {
-      const radio = document.querySelector(`input[name="classificacao"][value="${gameData.classificacao}"]`);
-      if (radio) radio.checked = true;
-    }
-    
-    // Verifica se é apenas anúncio
-    const isAnuncio = !gameData.link;
-    document.getElementById('anuncio').checked = isAnuncio;
-    toggleDownloadFields();
-    
-    // Carrega as imagens (apenas mostra que existem, não faz download)
-    if (gameData.icone) {
-      document.getElementById('icone-preview').innerHTML = `
-        <div class="existing-media">
-          <i class="fas fa-check-circle"></i>
-          Ícone já enviado anteriormente
-        </div>
-      `;
-    }
-    
-    if (gameData.prints && gameData.prints.length) {
-      document.getElementById('prints-preview').innerHTML = `
-        <div class="existing-media">
-          <i class="fas fa-check-circle"></i>
-          ${gameData.prints.length} print(s) já enviado(s)
-        </div>
-      `;
-    }
-  }
-
-  // Mostra prévia das imagens
-  function showImagePreview(file, containerId) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const previewContainer = document.getElementById(containerId);
-      if (containerId === 'icone-preview') {
-        previewContainer.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Prévia do ícone">`;
-      } else {
-        previewContainer.innerHTML += `<img src="${e.target.result}" class="preview-image" alt="Prévia do print">`;
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function toggleDownloadFields() {
-    const downloadFields = document.getElementById('download-fields');
-    const isAnuncio = document.getElementById('anuncio').checked;
-    
-    if (isAnuncio) {
-      downloadFields.style.opacity = '0.5';
-      downloadFields.style.pointerEvents = 'none';
-      document.querySelectorAll('#download-fields .required').forEach(el => {
-        el.classList.remove('required');
-      });
-    } else {
-      downloadFields.style.opacity = '1';
-      downloadFields.style.pointerEvents = 'auto';
-      document.querySelectorAll('#download-fields label[for="versao"], #download-fields label[for="link"]').forEach(el => {
-        el.classList.add('required');
+      printFiles.forEach((file, index) => {
+        showImagePreview(file, 'prints-preview');
       });
     }
-  }
+  });
+});
 
-  async function enviarJogo() {
-    const nome = document.getElementById('nome').value.trim();
-    const descricao = document.getElementById('descricao').value.trim();
-    const genero = document.getElementById('genero').value;
-    const link = document.getElementById('link').value.trim();
-    const video = document.getElementById('video').value.trim();
-    const versao = document.getElementById('versao').value.trim();
-    const packageId = document.getElementById('packageId').value.trim();
-    const isAnuncio = document.getElementById('anuncio').checked;
-    const classificacao = document.querySelector('input[name="classificacao"]:checked').value;
-    const currentUserId = localStorage.getItem('idUser') || 'anonymous';
-    const dev = localStorage.getItem('nome') || 'Desenvolvedor Desconhecido';
-
-    // Validação básica
-    if (!nome || !descricao || !packageId || !genero) {
-      showAlert('Preencha todos os campos obrigatórios!', 'error');
-      return;
-    }
-
-    // Validação para downloads (se não for apenas anúncio)
-    if (!isAnuncio && (!versao || !link)) {
-      showAlert('Para enviar o jogo com download, preencha a versão e o link!', 'error');
-      return;
-    }
-
-    if (!isAnuncio && !link.includes('mediafire.com')) {
-      showAlert('O link deve ser do MediaFire!', 'error');
-      return;
-    }
-
-    if (!iconFile && (!isEditing || !currentGameData?.icone)) {
-      showAlert('Por favor, faça o upload do ícone!', 'error');
-      return;
-    }
-
-    // Verificação adicional para edição
-    if (isEditing && currentGameOwnerId !== currentUserId) {
-      showAlert('Você não tem permissão para editar este jogo!', 'error');
-      return;
-    }
-
-    showAlert('Preparando envio...', 'loading');
-
-    try {
-      // Preparar os dados do jogo
-      const gameData = {
-        idUser: currentUserId,
-        nome,
-        descricao,
-        genero,
-        versao: isAnuncio ? null : versao,
-        link: isAnuncio ? null : link,
-        dev,
-        packge: packageId,
-        video: video,
-        classificacao,
-        dataEnvio: new Date().toISOString(),
-        // Mantém os dados antigos se não forem substituídos
-        ...(isEditing && !iconFile ? { icone: currentGameData.icone } : {}),
-        ...(isEditing && printFiles.length === 0 ? { prints: currentGameData.prints } : {})
-      };
-
-      // Preparar imagens para upload (somente se forem novas)
-      const images = [];
-      
-      if (iconFile) {
-        const iconBase64 = await fileToBase64(iconFile);
-        images.push(`data:${iconFile.type};base64,${iconBase64}`);
-      }
-      
-      for (const file of printFiles) {
-        const printBase64 = await fileToBase64(file);
-        images.push(`data:${file.type};base64,${printBase64}`);
-      }
-
-      // Enviar para a API de upload
-      const response = await fetch('https://cm-store.vercel.app/api/uppload.js', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          gameData,
-          images: images.length > 0 ? images : null,
-          packageId
-        })
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        showAlert(isEditing ? 'Jogo atualizado com sucesso!' : 'Jogo enviado com sucesso!', 'success');
-        setTimeout(() => {
-          window.location.href = `game.html?id=${packageId}`;
-        }, 1500);
-      } else {
-        throw new Error(result.error || 'Erro ao enviar o jogo');
-      }
-    } catch (error) {
-      console.error('Erro ao enviar jogo:', error);
-      showAlert(`Erro: ${error.message}`, 'error');
-    }
-  }
-
-  // Converte arquivo para base64
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64String = reader.result.split(',')[1];
-        resolve(base64String);
-      };
-      reader.onerror = error => reject(error);
-    });
-  }
-
-  function showAlert(message, type) {
-    const alerta = document.getElementById('alerta');
-    alerta.textContent = message;
-    alerta.className = `alert ${type}`;
-  }
-
-  function limparCampos() {
-    document.getElementById('nome').value = '';
-    document.getElementById('descricao').value = '';
-    document.getElementById('icone').value = '';
-    document.getElementById('prints').value = '';
-    document.getElementById('link').value = '';
-    document.getElementById('video').value = '';
-    document.getElementById('versao').value = '';
-    document.getElementById('packageId').value = '';
-    document.getElementById('genero').value = 'ação';
-    document.querySelector('input[name="classificacao"][value="L"]').checked = true;
-    document.getElementById('anuncio').checked = false;
-    document.getElementById('icone-preview').innerHTML = '';
-    document.getElementById('prints-preview').innerHTML = '';
+async function verificarJogoExistente(packageId) {
+  if (!packageId) {
     document.getElementById('package-status').textContent = 'Digite o package para verificar disponibilidade';
     document.getElementById('package-status').style.color = '#FFA000';
-    toggleDownloadFields();
-    
-    iconFile = null;
-    printFiles = [];
     isEditing = false;
     currentGameId = null;
     currentGameOwnerId = null;
     currentGameData = null;
-    
-    showAlert('', ''); // Limpa o alerta
+    return;
   }
+
+  const packageStatus = document.getElementById('package-status');
+  packageStatus.textContent = 'Verificando package...';
+  packageStatus.style.color = '#FFA000';
+
+  try {
+    const response = await fetch(`https://cm-store.vercel.app/api/games.js?gameId=${packageId}`);
+    
+    if (!response.ok) {
+      throw new Error('Erro na verificação');
+    }
+
+    const gameData = await response.json();
+
+    if (gameData.error && gameData.error === "Jogo não encontrado") {
+      packageStatus.textContent = 'Package disponível para uso.';
+      packageStatus.style.color = '#4CAF50';
+      isEditing = false;
+      currentGameId = null;
+      currentGameOwnerId = null;
+      currentGameData = null;
+    } else if (gameData.idUser) {
+      const currentUserId = localStorage.getItem('idUser');
+      currentGameData = gameData;
+      
+      if (gameData.idUser === currentUserId) {
+        packageStatus.textContent = 'Jogo encontrado. Modo edição ativado.';
+        packageStatus.style.color = '#4CAF50';
+        preencherCamposEdicao(gameData);
+        isEditing = true;
+        currentGameId = packageId;
+        currentGameOwnerId = gameData.idUser;
+      } else {
+        packageStatus.textContent = 'Este package já está em uso por outro desenvolvedor.';
+        packageStatus.style.color = '#FF5252';
+        isEditing = false;
+        currentGameId = null;
+        currentGameOwnerId = null;
+        currentGameData = null;
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao verificar jogo:', error);
+    packageStatus.textContent = 'Erro ao verificar package. Tente novamente.';
+    packageStatus.style.color = '#FF5252';
+    isEditing = false;
+    currentGameId = null;
+    currentGameOwnerId = null;
+    currentGameData = null;
+  }
+}
+
+function preencherCamposEdicao(gameData) {
+  document.getElementById('nome').value = gameData.nome || '';
+  document.getElementById('descricao').value = gameData.descricao || '';
+  document.getElementById('genero').value = gameData.genero || 'ação';
+  document.getElementById('versao').value = gameData.versao || '';
+  document.getElementById('link').value = gameData.link || '';
+  document.getElementById('video').value = gameData.video || '';
+  
+  if (gameData.classificacao) {
+    const radio = document.querySelector(`input[name="classificacao"][value="${gameData.classificacao}"]`);
+    if (radio) radio.checked = true;
+  }
+  
+  const isAnuncio = !gameData.link;
+  document.getElementById('anuncio').checked = isAnuncio;
+  toggleDownloadFields();
+  
+  if (gameData.icone) {
+    document.getElementById('icone-preview').innerHTML = `
+      <div class="existing-media">
+        <i class="fas fa-check-circle"></i>
+        Ícone já enviado anteriormente
+      </div>
+    `;
+  }
+  
+  if (gameData.prints && gameData.prints.length) {
+    document.getElementById('prints-preview').innerHTML = `
+      <div class="existing-media">
+        <i class="fas fa-check-circle"></i>
+        ${gameData.prints.length} print(s) já enviado(s)
+      </div>
+    `;
+  }
+}
+
+function showImagePreview(file, containerId) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const previewContainer = document.getElementById(containerId);
+    if (containerId === 'icone-preview') {
+      previewContainer.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Prévia do ícone">`;
+    } else {
+      previewContainer.innerHTML += `<img src="${e.target.result}" class="preview-image" alt="Prévia do print">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleDownloadFields() {
+  const downloadFields = document.getElementById('download-fields');
+  const isAnuncio = document.getElementById('anuncio').checked;
+  
+  if (isAnuncio) {
+    downloadFields.style.opacity = '0.5';
+    downloadFields.style.pointerEvents = 'none';
+    document.querySelectorAll('#download-fields .required').forEach(el => {
+      el.classList.remove('required');
+    });
+  } else {
+    downloadFields.style.opacity = '1';
+    downloadFields.style.pointerEvents = 'auto';
+    document.querySelectorAll('#download-fields label[for="versao"], #download-fields label[for="link"]').forEach(el => {
+      el.classList.add('required');
+    });
+  }
+}
+
+async function enviarJogo() {
+  const nome = document.getElementById('nome').value.trim();
+  const descricao = document.getElementById('descricao').value.trim();
+  const genero = document.getElementById('genero').value;
+  const link = document.getElementById('link').value.trim();
+  const video = document.getElementById('video').value.trim();
+  const versao = document.getElementById('versao').value.trim();
+  const packageId = document.getElementById('packageId').value.trim();
+  const isAnuncio = document.getElementById('anuncio').checked;
+  const classificacao = document.querySelector('input[name="classificacao"]:checked').value;
+  const currentUserId = localStorage.getItem('idUser') || 'anonymous';
+  const dev = localStorage.getItem('nome') || 'Desenvolvedor Desconhecido';
+
+  if (!nome || !descricao || !packageId || !genero) {
+    showAlert('Preencha todos os campos obrigatórios!', 'error');
+    return;
+  }
+
+  if (!isAnuncio && (!versao || !link)) {
+    showAlert('Para enviar o jogo com download, preencha a versão e o link!', 'error');
+    return;
+  }
+
+  if (!isAnuncio && !link.includes('mediafire.com')) {
+    showAlert('O link deve ser do MediaFire!', 'error');
+    return;
+  }
+
+  if (!iconFile && (!isEditing || !currentGameData?.icone)) {
+    showAlert('Por favor, faça o upload do ícone!', 'error');
+    return;
+  }
+
+  if (isEditing && currentGameOwnerId !== currentUserId) {
+    showAlert('Você não tem permissão para editar este jogo!', 'error');
+    return;
+  }
+
+  showAlert('Preparando envio...', 'loading');
+
+  try {
+    const gameData = {
+      idUser: currentUserId,
+      nome,
+      descricao,
+      genero,
+      versao: isAnuncio ? null : versao,
+      link: isAnuncio ? null : link,
+      dev,
+      packge: packageId,
+      video: video,
+      classificacao,
+      dataEnvio: new Date().toISOString(),
+      ...(isEditing && !iconFile ? { icone: currentGameData.icone } : {}),
+      ...(isEditing && printFiles.length === 0 ? { prints: currentGameData.prints } : {})
+    };
+
+    const images = [];
+    
+    if (iconFile) {
+      const iconBase64 = await fileToBase64(iconFile);
+      images.push(`data:${iconFile.type};base64,${iconBase64}`);
+    }
+    
+    for (const file of printFiles) {
+      const printBase64 = await fileToBase64(file);
+      images.push(`data:${file.type};base64,${printBase64}`);
+    }
+
+    const response = await fetch('https://cm-store.vercel.app/api/uppload.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        gameData,
+        images: images.length > 0 ? images : null,
+        packageId
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      showAlert(isEditing ? 'Jogo atualizado com sucesso!' : 'Jogo enviado com sucesso!', 'success');
+      setTimeout(() => {
+        window.location.href = `game.html?id=${packageId}`;
+      }, 1500);
+    } else {
+      throw new Error(result.error || 'Erro ao enviar o jogo');
+    }
+  } catch (error) {
+    console.error('Erro ao enviar jogo:', error);
+    showAlert(`Erro: ${error.message}`, 'error');
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = error => reject(error);
+  });
+}
+
+function showAlert(message, type) {
+  const alerta = document.getElementById('alerta');
+  alerta.textContent = message;
+  alerta.className = `alert ${type}`;
+}
+
+function limparCampos() {
+  document.getElementById('nome').value = '';
+  document.getElementById('descricao').value = '';
+  document.getElementById('icone').value = '';
+  document.getElementById('prints').value = '';
+  document.getElementById('link').value = '';
+  document.getElementById('video').value = '';
+  document.getElementById('versao').value = '';
+  document.getElementById('packageId').value = '';
+  document.getElementById('genero').value = 'ação';
+  document.querySelector('input[name="classificacao"][value="L"]').checked = true;
+  document.getElementById('anuncio').checked = false;
+  document.getElementById('icone-preview').innerHTML = '';
+  document.getElementById('prints-preview').innerHTML = '';
+  document.getElementById('package-status').textContent = 'Digite o package para verificar disponibilidade';
+  document.getElementById('package-status').style.color = '#FFA000';
+  toggleDownloadFields();
+  
+  iconFile = null;
+  printFiles = [];
+  isEditing = false;
+  currentGameId = null;
+  currentGameOwnerId = null;
+  currentGameData = null;
+  
+  showAlert('', '');
+}
 </script>
 </body>
 </html>
