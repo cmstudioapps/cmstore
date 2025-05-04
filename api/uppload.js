@@ -1,16 +1,14 @@
-// upload.js - API para upload de jogos
 export default async function handler(req, res) {
-    // Configurações de CORS seguras
-
+  // Configurações de CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-res.setHeader('Access-Control-Allow-Methods', '*');
-res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Chave do ImgBB (armazenada em variáveis de ambiente)
+  // Chaves e URLs
   const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
   const FIREBASE_URL = process.env.FIREBASE_URL || "https://jogos-a1a46-default-rtdb.firebaseio.com";
 
-  // Verifica se é uma requisição OPTIONS (pré-flight do CORS)
+  // Pré-flight CORS
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -23,9 +21,21 @@ res.setHeader('Access-Control-Allow-Headers', '*');
   try {
     const { gameData, images } = req.body;
 
-    // Validação básica dos dados
+    // Validação dos dados
     if (!gameData || !gameData.nome || !gameData.idUser) {
       return res.status(400).json({ error: 'Dados do jogo incompletos' });
+    }
+
+    // Valida link Mediafire
+    if (gameData.link && !gameData.link.includes('mediafire.com')) {
+      return res.status(400).json({ error: 'Apenas links do MediaFire são aceitos para download' });
+    }
+
+    // Converte link do YouTube para embed se existir
+    if (gameData.video && gameData.video.includes('youtube.com')) {
+      gameData.video = gameData.video
+        .replace('watch?v=', 'embed/')
+        .replace('youtu.be/', 'youtube.com/embed/');
     }
 
     // Upload das imagens para o ImgBB
@@ -33,7 +43,7 @@ res.setHeader('Access-Control-Allow-Headers', '*');
     if (images && images.length > 0) {
       for (const image of images) {
         const formData = new FormData();
-        formData.append('image', image.split(',')[1]); // Remove o prefixo data:image/...
+        formData.append('image', image.split(',')[1]);
 
         const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
           method: 'POST',
@@ -47,11 +57,12 @@ res.setHeader('Access-Control-Allow-Headers', '*');
       }
     }
 
-    // Prepara os dados para o Firebase
+    // Prepara dados para o Firebase
     const gameToSave = {
       ...gameData,
       prints: uploadedImages,
-      dataEnvio: new Date().toISOString()
+      dataEnvio: new Date().toISOString(),
+      dev: gameData.dev || 'Desenvolvedor não especificado'
     };
 
     // Envia para o Firebase
@@ -69,10 +80,10 @@ res.setHeader('Access-Control-Allow-Headers', '*');
       throw new Error('Erro ao salvar no banco de dados');
     }
 
-    // Retorna sucesso com o ID do jogo
+    // Retorna sucesso
     res.status(200).json({ 
       success: true, 
-      gameId: firebaseData.name // Firebase retorna o ID no campo 'name'
+      gameId: firebaseData.name
     });
 
   } catch (error) {
