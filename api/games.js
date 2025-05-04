@@ -1,8 +1,9 @@
 export default function handler(req, res) {
   // Configurações de CORS seguras
   
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Methods', '*');
+res.setHeader('Access-Control-Allow-Headers', '*');
 
   // URL do Firebase a partir de variáveis de ambiente
   const FIREBASE_URL = process.env.FIREBASE_URL || "https://jogos-a1a46-default-rtdb.firebaseio.com";
