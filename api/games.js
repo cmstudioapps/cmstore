@@ -1,71 +1,81 @@
 export default function handler(req, res) {
-  // Permite acesso de qualquer site
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Configurações de CORS seguras
+  res.setHeader('Access-Control-Allow-Origin', 'https://cm-store.vercel.app');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // URL do banco de dados no Firebase
-  const firebaseUrl = "https://jogos-a1a46-default-rtdb.firebaseio.com/jogos";
-  
-  // Pega os parâmetros da URL
-  const { games, gameId, developerId } = req.query;
+  // URL do Firebase a partir de variáveis de ambiente
+  const FIREBASE_URL = process.env.FIREBASE_URL || "https://jogos-a1a46-default-rtdb.firebaseio.com";
 
-  // Se pedir todos os jogos
-  if (games === "true") {
-    fetch(`${firebaseUrl}/.json`)
-      .then(resposta => resposta.json())
-      .then(dados => {
-        // Converte de objeto para array
-        const jogosArray = dados ? Object.keys(dados).map(id => ({
-          ...dados[id],
-          id // Adiciona o ID em cada jogo
-        })) : [];
-        
-        res.status(200).json(jogosArray);
+  // Tipos de requisição suportados
+  const { games, gameId, developerId, verifiedUsers } = req.query;
+
+  // Handler para usuários verificados
+  if (verifiedUsers === "true") {
+    return fetch(`${FIREBASE_URL}/vv/.json`)
+      .then(response => response.json())
+      .then(data => {
+        res.status(200).json(data || {});
       })
-      .catch(erro => {
-        console.error("Erro:", erro);
-        res.status(500).json({ erro: "Falha ao buscar jogos" });
-      });
-  } 
-  
-  // Se pedir um jogo específico
-  else if (gameId) {
-    fetch(`${firebaseUrl}/${gameId}/.json`)
-      .then(resposta => resposta.json())
-      .then(jogo => {
-        if (!jogo) {
-          return res.status(404).json({ erro: "Jogo não existe" });
-        }
-        res.status(200).json({ ...jogo, id: gameId });
-      })
-      .catch(erro => {
-        console.error("Erro:", erro);
-        res.status(500).json({ erro: "Falha ao buscar o jogo" });
+      .catch(error => {
+        console.error("Erro Firebase:", error);
+        res.status(500).json({ error: "Erro ao buscar usuários verificados" });
       });
   }
-  
-  // Se pedir jogos de um desenvolvedor
-  else if (developerId) {
-    fetch(`${firebaseUrl}/.json?orderBy="idUser"&equalTo="${developerId}"`)
-      .then(resposta => resposta.json())
-      .then(dados => {
-        const jogosDev = dados ? Object.keys(dados).map(id => ({
-          ...dados[id],
+
+  // Handler para jogos específicos
+  if (gameId) {
+    return fetch(`${FIREBASE_URL}/jogos/${gameId}/.json`)
+      .then(response => response.json())
+      .then(game => {
+        if (!game) {
+          return res.status(404).json({ error: "Jogo não encontrado" });
+        }
+        res.status(200).json({ ...game, id: gameId });
+      })
+      .catch(error => {
+        console.error("Erro Firebase:", error);
+        res.status(500).json({ error: "Erro ao buscar jogo" });
+      });
+  }
+
+  // Handler para jogos de desenvolvedor
+  if (developerId) {
+    return fetch(`${FIREBASE_URL}/jogos/.json?orderBy="idUser"&equalTo="${developerId}"`)
+      .then(response => response.json())
+      .then(data => {
+        const games = data ? Object.keys(data).map(id => ({
+          ...data[id],
           id
         })) : [];
-        
-        res.status(200).json(jogosDev);
+        res.status(200).json(games);
       })
-      .catch(erro => {
-        console.error("Erro:", erro);
-        res.status(500).json({ erro: "Falha ao buscar jogos do dev" });
+      .catch(error => {
+        console.error("Erro Firebase:", error);
+        res.status(500).json({ error: "Erro ao buscar jogos do desenvolvedor" });
       });
   }
-  
-  // Se não passar parâmetro válido
-  else {
-    res.status(400).json({ 
-      erro: "Use: ?games=true OU ?gameId=ID OU ?developerId=ID" 
-    });
+
+  // Handler para todos os jogos
+  if (games === "true") {
+    return fetch(`${FIREBASE_URL}/jogos/.json`)
+      .then(response => response.json())
+      .then(data => {
+        const games = data ? Object.keys(data).map(id => ({
+          ...data[id],
+          id
+        })) : [];
+        res.status(200).json(games);
+      })
+      .catch(error => {
+        console.error("Erro Firebase:", error);
+        res.status(500).json({ error: "Erro ao buscar jogos" });
+      });
   }
+
+  // Resposta padrão para requisições inválidas
+  res.status(400).json({ 
+    error: "Parâmetro inválido. Use: ?games=true, ?gameId=ID, ?developerId=ID ou ?verifiedUsers=true",
+    example: "https://cm-store.vercel.app/api/games.js?games=true"
+  });
 }
