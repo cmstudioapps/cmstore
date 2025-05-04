@@ -1,9 +1,11 @@
 export default function handler(req, res) {
   // Configurações de CORS seguras
   
-  res.setHeader('Access-Control-Allow-Origin', '*');
-res.setHeader('Access-Control-Allow-Methods', '*');
-res.setHeader('Access-Control-Allow-Headers', '*');
+  // Permite CORS apenas para o domínio especificado
+res.setHeader('Access-Control-Allow-Origin', 'https://cm-store.vercel.app');
+res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+res.setHeader('Access-Control-Allow-Credentials', 'true'); // Opcional, se usar cookies/auth
 
   // URL do Firebase a partir de variáveis de ambiente
   const FIREBASE_URL = process.env.FIREBASE_URL || "https://jogos-a1a46-default-rtdb.firebaseio.com";
