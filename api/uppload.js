@@ -1,12 +1,11 @@
 export default async function handler(req, res) {
-   // Configurações de CORS seguras
-
+  // Configurações de CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-res.setHeader('Access-Control-Allow-Methods', '*');
-res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   // Chaves e URLs
-  const IMGBB_API_KEY = process.env.IMGBB_API_KEY || "0863e0eee12396e6097628c10fdc5228";
+  const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
   const FIREBASE_URL = process.env.FIREBASE_URL || "https://jogos-a1a46-default-rtdb.firebaseio.com";
 
   // Pré-flight CORS
@@ -20,11 +19,11 @@ res.setHeader('Access-Control-Allow-Headers', '*');
   }
 
   try {
-    const { gameData, images } = req.body;
+    const { gameData, images, packageId } = req.body;
 
     // Validação dos dados
-    if (!gameData || !gameData.nome || !gameData.idUser) {
-      return res.status(400).json({ error: 'Dados do jogo incompletos' });
+    if (!packageId || !gameData || !gameData.nome || !gameData.idUser) {
+      return res.status(400).json({ error: 'Dados incompletos. Package ID e dados do jogo são obrigatórios.' });
     }
 
     // Valida link Mediafire
@@ -66,9 +65,9 @@ res.setHeader('Access-Control-Allow-Headers', '*');
       dev: gameData.dev || 'Desenvolvedor não especificado'
     };
 
-    // Envia para o Firebase
-    const firebaseResponse = await fetch(`${FIREBASE_URL}/jogos.json`, {
-      method: 'POST',
+    // Envia para o Firebase usando o packageId como chave
+    const firebaseResponse = await fetch(`${FIREBASE_URL}/jogos/${packageId}.json`, {
+      method: 'PUT', // Usamos PUT para criar/atualizar com a chave específica
       headers: {
         'Content-Type': 'application/json'
       },
@@ -84,7 +83,7 @@ res.setHeader('Access-Control-Allow-Headers', '*');
     // Retorna sucesso
     res.status(200).json({ 
       success: true, 
-      gameId: firebaseData.name
+      gameId: packageId // Retorna o packageId como ID do jogo
     });
 
   } catch (error) {
