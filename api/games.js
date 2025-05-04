@@ -1,6 +1,6 @@
 export default function handler(req, res) {
   // Configurações de CORS seguras
-  res.setHeader('Access-Control-Allow-Origin', 'https://cm-store.vercel.app');
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
