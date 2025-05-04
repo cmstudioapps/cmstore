@@ -1,8 +1,9 @@
 export default async function handler(req, res) {
-  // Configurações de CORS seguras
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', '*');
-  res.setHeader('Access-Control-Allow-Headers', '*');
+    // Permite CORS apenas para o domínio especificado
+res.setHeader('Access-Control-Allow-Origin', 'https://cm-store.vercel.app');
+res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+res.setHeader('Access-Control-Allow-Credentials', 'true'); // Opcional, se usar cookies/auth
 
   // Chaves e URLs
   const IMGBB_API_KEY = process.env.IMGBB_API_KEY || "0863e0eee12396e6097628c10fdc5228";
