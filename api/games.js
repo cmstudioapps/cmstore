@@ -1,47 +1,71 @@
 export default function handler(req, res) {
+  // Permite acesso de qualquer site
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  
-  const firebaseUrl = "https://jogos-a1a46-default-rtdb.firebaseio.com/jogos";
-  const { games, gameId } = req.query;
 
+  // URL do banco de dados no Firebase
+  const firebaseUrl = "https://jogos-a1a46-default-rtdb.firebaseio.com/jogos";
+  
+  // Pega os parâmetros da URL
+  const { games, gameId, developerId } = req.query;
+
+  // Se pedir todos os jogos
   if (games === "true") {
     fetch(`${firebaseUrl}/.json`)
-      .then(response => {
-        if (!response.ok) throw new Error("Erro ao buscar jogos");
-        return response.json();
-      })
-      .then(data => {
-        // Converte objeto do Firebase em array
-        const gamesArray = data ? Object.keys(data).map(key => ({
-          ...data[key],
-          id: key
+      .then(resposta => resposta.json())
+      .then(dados => {
+        // Converte de objeto para array
+        const jogosArray = dados ? Object.keys(dados).map(id => ({
+          ...dados[id],
+          id // Adiciona o ID em cada jogo
         })) : [];
-        res.status(200).json(gamesArray);
+        
+        res.status(200).json(jogosArray);
       })
-      .catch(error => {
-        console.error("Erro Firebase:", error);
-        res.status(500).json({ error: error.message });
+      .catch(erro => {
+        console.error("Erro:", erro);
+        res.status(500).json({ erro: "Falha ao buscar jogos" });
       });
   } 
+  
+  // Se pedir um jogo específico
   else if (gameId) {
     fetch(`${firebaseUrl}/${gameId}/.json`)
-      .then(response => {
-        if (!response.ok) throw new Error("Erro ao buscar jogo");
-        return response.json();
-      })
-      .then(data => {
-        if (!data) {
-          return res.status(404).json({ error: "Jogo não encontrado" });
+      .then(resposta => resposta.json())
+      .then(jogo => {
+        if (!jogo) {
+          return res.status(404).json({ erro: "Jogo não existe" });
         }
-        res.status(200).json({ ...data, id: gameId });
+        res.status(200).json({ ...jogo, id: gameId });
       })
-      .catch(error => {
-        console.error("Erro Firebase:", error);
-        res.status(500).json({ error: error.message });
+      .catch(erro => {
+        console.error("Erro:", erro);
+        res.status(500).json({ erro: "Falha ao buscar o jogo" });
       });
   }
+  
+  // Se pedir jogos de um desenvolvedor
+  else if (developerId) {
+    fetch(`${firebaseUrl}/.json?orderBy="idUser"&equalTo="${developerId}"`)
+      .then(resposta => resposta.json())
+      .then(dados => {
+        const jogosDev = dados ? Object.keys(dados).map(id => ({
+          ...dados[id],
+          id
+        })) : [];
+        
+        res.status(200).json(jogosDev);
+      })
+      .catch(erro => {
+        console.error("Erro:", erro);
+        res.status(500).json({ erro: "Falha ao buscar jogos do dev" });
+      });
+  }
+  
+  // Se não passar parâmetro válido
   else {
-    res.status(400).json({ error: "Parâmetro inválido. Use ?games=true ou ?gameId=ID" });
+    res.status(400).json({ 
+      erro: "Use: ?games=true OU ?gameId=ID OU ?developerId=ID" 
+    });
   }
 }
