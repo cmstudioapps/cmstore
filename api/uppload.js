@@ -1,8 +1,9 @@
 export default async function handler(req, res) {
-  // Configurações de CORS
+   // Configurações de CORS seguras
+
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+res.setHeader('Access-Control-Allow-Methods', '*');
+res.setHeader('Access-Control-Allow-Headers', '*');
 
   // Chaves e URLs
   const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
