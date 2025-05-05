@@ -29,5 +29,5 @@ botao.addEventListener("click", async () => {
 
 linkSuporte.addEventListener("click", (e) => {
   e.preventDefault();
-  window.location.href = "mailto:suporte@exemplo.com?subject=Problemas com login";
+  window.location.href = "https://www.instagram.com/programing_js?igsh=MTgzZHBsdmExNWJlbg==";
 });
