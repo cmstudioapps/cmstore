@@ -14,7 +14,7 @@ botao.addEventListener("click", async () => {
       if (data.login === true) {
         localStorage.setItem("id", id);
         localStorage.setItem("userPassword", senha);
-        window.location.href = "index.html";
+        window.location.href = "keyLogin.html";
       } else {
         alertas.textContent = "Credenciais inválidas. Verifique seu ID e senha.";
       }
