@@ -397,6 +397,13 @@
 <script>
     const idUsuario = localStorage.getItem("id");
     const senhaUsuario = localStorage.getItem("userPassword");
+
+if(!idUsuario || !senhaUsuario) {
+            
+     window.location.href = "login.html"
+            
+        }
+
     let dadosUsuario = null;
     
     const elementos = {
