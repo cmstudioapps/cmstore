@@ -17,6 +17,15 @@ localStorage.setItem("ads1",chances)
       expiration: "2025-04-25", // formato YYYY-MM-DD
       once: false,
       chance: chances
+    },
+{
+      title: "NOVA API!!",
+      description: "Você é desenvolvedor de jogos? conheça a api de jogos feita para devs do pocket code! ela permite que você faça jogos premiuns!",
+      image: "",
+      link: "keyDoc.html",
+      expiration: "2025-06-25", // formato YYYY-MM-DD
+      once: false,
+      chance: 30
     }
     
   ];
