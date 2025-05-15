@@ -569,7 +569,7 @@ async function setupHeroBanner() {
     
     // Set hero banner content
     const heroVideo = document.querySelector('.hero-video');
-    heroVideo.src = featuredGame.video;
+    heroVideo.src = featuredGame.video+"?autoplay=1&muted=1";
     heroVideo.classList.add('active');
     
     document.getElementById('heroTitle').textContent = featuredGame.nome || 'Jogo em Destaque';
