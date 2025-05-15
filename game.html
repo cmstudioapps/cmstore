@@ -123,6 +123,23 @@
       max-width: 800px;
       z-index: 2;
       animation: fadeInUp 0.8s ease-out;
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+    }
+
+    .game-icon-large {
+      width: 120px;
+      height: 120px;
+      border-radius: 20px;
+      object-fit: cover;
+      border: 3px solid #FFA000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+
+    .game-info-container {
+      flex: 1;
     }
 
     .game-title {
@@ -455,6 +472,15 @@
         min-height: 400px;
       }
 
+      .game-hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .game-icon-large {
+        margin-bottom: 20px;
+      }
+
       .game-title {
         font-size: 2rem;
       }
@@ -634,45 +660,51 @@
       // Cria o HTML do jogo
       content.innerHTML = `
         <section class="game-hero">
-          ${game.banner ? `
-            <img src="${game.icone}" class="game-hero-backdrop" alt="${game.nome || 'Jogo sem nome'}"
-                 onerror="this.style.display='none'">
+          ${game.video ? `
+            <iframe autoplay muted loop class="game-hero-backdrop" src="${game.video}">
+
           ` : ''}
           <div class="game-hero-overlay"></div>
           <div class="game-hero-content">
-            <h1 class="game-title">${game.nome || 'Jogo sem nome'}</h1>
-            <div class="game-meta">
-              ${game.genero ? `<span class="game-meta-item">${game.genero.charAt(0).toUpperCase() + game.genero.slice(1)}</span>` : ''}
-              ${game.versao ? `<span class="game-meta-item">Versão ${game.versao}</span>` : ''}
-              ${game.classificacao ? `
-                <span class="game-meta-item">
-                  Classificação: <span class="age-rating ${game.classificacao}">
-                    ${game.classificacao === 'L' ? 'Livre' : game.classificacao+'+'}
-                  </span>
-                </span>
-              ` : ''}
-            </div>
-            ${game.dev || game.idUser ? `
-              <div class="game-meta">
-                <span class="game-meta-item">
-                  Desenvolvedor: ${game.dev || game.idUser}
-                  ${game.verified ? '<i class="fas fa-check-circle verified-badge" title="Desenvolvedor verificado"></i>' : ''}
-                </span>
-              </div>
+            ${game.icone ? `
+              <img src="${game.icone}" class="game-icon-large" alt="${game.nome || 'Jogo sem nome'}"
+                   onerror="this.src='https://via.placeholder.com/120?text=CM+Store'">
             ` : ''}
-            <div class="game-actions">
-              ${game.link ? `
-                <a href="${game.link}" class="game-button game-button-primary" target="_blank" rel="noopener noreferrer">
-                  <i class="fas fa-download"></i> Baixar
-                </a>
-              ` : `
-                <button class="game-button game-button-primary disabled">
-                  <i class="fas fa-clock"></i> Em breve
+            <div class="game-info-container">
+              <h1 class="game-title">${game.nome || 'Jogo sem nome'}</h1>
+              <div class="game-meta">
+                ${game.genero ? `<span class="game-meta-item">${game.genero.charAt(0).toUpperCase() + game.genero.slice(1)}</span>` : ''}
+                ${game.versao ? `<span class="game-meta-item">Versão ${game.versao}</span>` : ''}
+                ${game.classificacao ? `
+                  <span class="game-meta-item">
+                    Classificação: <span class="age-rating ${game.classificacao}">
+                      ${game.classificacao === 'L' ? 'Livre' : game.classificacao+'+'}
+                    </span>
+                  </span>
+                ` : ''}
+              </div>
+              ${game.dev || game.idUser ? `
+                <div class="game-meta">
+                  <span class="game-meta-item">
+                    Desenvolvedor: ${game.dev || game.idUser}
+                    ${game.verified ? '<i class="fas fa-check-circle verified-badge" title="Desenvolvedor verificado"></i>' : ''}
+                  </span>
+                </div>
+              ` : ''}
+              <div class="game-actions">
+                ${game.link ? `
+                  <a href="${game.link}" class="game-button game-button-primary" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-download"></i> Baixar
+                  </a>
+                ` : `
+                  <button class="game-button game-button-primary disabled">
+                    <i class="fas fa-clock"></i> Em breve
+                  </button>
+                `}
+                <button class="game-button game-button-secondary" onclick="shareGame()">
+                  <i class="fas fa-share-alt"></i> Compartilhar
                 </button>
-              `}
-              <button class="game-button game-button-secondary" onclick="shareGame()">
-                <i class="fas fa-share-alt"></i> Compartilhar
-              </button>
+              </div>
             </div>
           </div>
         </section>
@@ -682,20 +714,6 @@
             <div class="game-section">
               <h2 class="section-title">Descrição</h2>
               <p class="game-description">${game.descricao}</p>
-            </div>
-          ` : ''}
-
-          ${game.video ? `
-            <div class="game-section media-section">
-              <h2 class="section-title">Vídeo</h2>
-              <div class="video-container">
-                <iframe src="${game.video.includes('youtube.com') ? 
-                  game.video.replace('watch?v=', 'embed/') : 
-                  game.video}" 
-                  frameborder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowfullscreen></iframe>
-              </div>
             </div>
           ` : ''}
 
@@ -716,6 +734,14 @@
         <div id="developer-games-section" class="game-container"></div>
         <div id="comments-section"></div>
       `;
+
+      // Configura o vídeo para autoplay em mute
+      const heroVideo = document.querySelector('.game-hero-backdrop');
+      if (heroVideo) {
+        heroVideo.muted = true;
+        heroVideo.playsInline = true;
+        heroVideo.play().catch(e => console.log('Autoplay prevented:', e));
+      }
     }
 
     // Função para carregar jogos do mesmo desenvolvedor
@@ -756,10 +782,10 @@
           const gameId = game.id || game.key;
           gamesScroll.innerHTML += `
             <a href="game.html?id=${gameId}" class="game-card">
-              <img src="${game.icone || game.banner || 'https://via.placeholder.com/200x120'}" 
+              <img src="${game.icone || 'https://via.placeholder.com/200x120?text=CM+Store'}" 
                    class="game-card-img" 
                    alt="${game.nome || 'Jogo sem nome'}"
-                   onerror="this.src='https://via.placeholder.com/200x120'">
+                   onerror="this.src='https://via.placeholder.com/200x120?text=CM+Store'">
               <div class="game-card-info">
                 <div class="game-card-title">${game.nome || 'Jogo sem nome'}</div>
                 <div class="game-card-dev">${game.dev || game.idUser || ''}</div>
