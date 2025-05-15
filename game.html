@@ -738,9 +738,9 @@
       // Configura o vídeo para autoplay em mute
       const heroVideo = document.querySelector('.game-hero-backdrop');
       if (heroVideo) {
-        heroVideo.muted = true;
-        heroVideo.playsInline = true;
-        heroVideo.play().catch(e => console.log('Autoplay prevented:', e));
+        heroVideo.muted = false;
+        heroVideo.autoplay = true;
+        heroVideo.click().catch(e => console.log('Autoplay prevented:', e));
       }
     }
 
