@@ -514,6 +514,20 @@
 <script src="ads.js"></script>
 
 <script>
+    if(!localStorage.getItem("muted")) {
+      setTimeout(() => {
+        info("Aumenta o som "+localStorage.getItem("nome")+"! 🔊, {
+          duration: 4000,
+          position: "top-right",
+          fullFocus: true,
+          onClick: () => localStorage.setItem("muted","muted")
+        });
+      }, 2000);
+    }
+
+
+
+
 const DB_URL = 'https://cm-store.vercel.app/api/games.js?games=true';
 
 // Navbar scroll effect
