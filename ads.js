@@ -26,6 +26,15 @@ localStorage.setItem("ads1",chances)
       expiration: "2025-06-25", // formato YYYY-MM-DD
       once: false,
       chance: 30
+    },
+{
+      title: "VEM JOGAR!",
+      description: "Após um assassinato de uma jovem em um acampamento, o policial Case toma posse do caso e começa a investiga-lo.",
+      image: "https://i.imgur.com/YobRQ43.jpeg",
+      link: "keyDoc.html",
+      expiration: "2025-06-16", // formato YYYY-MM-DD
+      once: false,
+      chance: 35
     }
     
   ];
