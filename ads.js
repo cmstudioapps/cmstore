@@ -30,8 +30,8 @@ localStorage.setItem("ads1",chances)
 {
       title: "VEM JOGAR!",
       description: "Após um assassinato de uma jovem em um acampamento, o policial Case toma posse do caso e começa a investiga-lo.",
-      image: "https://i.imgur.com/YobRQ43.jpeg",
-      link: "keyDoc.html",
+      image: "https://i.imgur.com/XhFWYOx.jpeg",
+      link: "https://cm-store.vercel.app/game.html?id=com-bleizistudio-thescarytiler",
       expiration: "2025-06-16", // formato YYYY-MM-DD
       once: false,
       chance: 35
