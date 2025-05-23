@@ -9,8 +9,8 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         title: "Título da Notificação",
         message: "Conteúdo da mensagem da notificação",
-        url: "https://seusite.com",
-        image: "https://seusite.com/imagem.jpg", // pode ser deixado em branco se não quiser imagem
+        url: "https://cm-store.vercel.app",
+        image: "", // pode ser deixado em branco se não quiser imagem
         segment: 0 // 0 significa enviar para todos os inscritos
       })
     });
