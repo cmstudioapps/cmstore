@@ -9,22 +9,21 @@ export default async function handler(req, res) {
   };
 
   try {
-    // 1. Faz a requisição para a API do PushAlert
-    const response = await fetch("https://pushalert.co/api/v1/send", { // 👈 Note a mudança no endpoint
+    // 1. Faz a requisição para o endpoint CORRETO da API
+    const response = await fetch("https://api.pushalert.co/rest/v1/send", { // 👈 Endpoint corrigido
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.PUSHALERT_API_KEY || '60a78f90a87cca4b9908cde4ff1e323d'}`, // Formato corrigido
-        "Content-Type": "application/json",
-        "Accept": "application/json" // Forçamos resposta JSON
+        "Authorization": "api_key=60a78f90a87cca4b9908cde4ff1e323d", // Formato oficial
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(notificationData)
     });
 
-    // 2. Verifica o tipo de conteúdo da resposta
-    const contentType = response.headers.get('content-type');
+    // 2. Processa a resposta
+    const responseText = await response.text();
     
-    if (contentType && contentType.includes('application/json')) {
-      const jsonResponse = await response.json();
+    try {
+      const jsonResponse = JSON.parse(responseText);
       
       if (response.ok) {
         res.status(200).json({
@@ -34,18 +33,15 @@ export default async function handler(req, res) {
       } else {
         res.status(response.status).json({
           status: "error",
-          message: jsonResponse.message || "Erro na API PushAlert",
+          message: jsonResponse.error || "Erro na API PushAlert",
           details: jsonResponse
         });
       }
-    } else {
-      const textResponse = await response.text();
-      console.error("Resposta inesperada:", textResponse);
-      
+    } catch (e) {
       res.status(500).json({
         status: "error",
-        message: "Formato de resposta inesperado da API",
-        rawResponse: textResponse
+        message: "Resposta inválida da API",
+        rawResponse: responseText
       });
     }
 
