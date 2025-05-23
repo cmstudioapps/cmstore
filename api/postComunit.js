@@ -69,10 +69,10 @@ export default async function handler(req, res) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Basic os_v2_app_bbokkq4cnjhqjgbuwznbkiownitgq65d3bxeype2owlhizj2mpssgw55rwb3dhgvlw3fal47ozqpvbpbo46xfegudi2btyl4yctrowa"
+            "Authorization": "Basic os_v2_app_sratmhknejadjay5dyvabk4nybz7xsdi5bkenzuhu2fip7mp3fbz4ffcby7jnz3dz2s56rddwtl5g4fywfyk22n4one76mhtzsfu53y"
           },
           body: JSON.stringify({
-            app_id: "085ca543-826a-4f04-9834-b65a1521d66a",
+            app_id: "9441361d-4d22-4034-831d-1e2a00ab8dc0",
             included_segments: ["All"],
             headings: { pt: "Nova publicação na CM STORE", en: "New post in CM STORE" },
             contents: { pt: textoLimitado, en: textoLimitado },
