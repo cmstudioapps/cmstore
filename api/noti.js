@@ -39,8 +39,8 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         app_id: "9441361d-4d22-4034-831d-1e2a00ab8dc0",
         included_segments: ["All"],
-        headings: { pt: titulo },
-        contents: { pt: mensagem },
+        headings: { pt: titulo, en: titulo},
+        contents: { pt: mensagem, eng: mensagem },
         url: url || "https://cmstore.com"
       })
     });
