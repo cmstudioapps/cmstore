@@ -9,14 +9,7 @@ export default async function handler(req, res) {
     server_error: "Erro interno no servidor"
   };
 
-  // 1. Verifica o método HTTP
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      status: "error",
-      message: MESSAGES.method_not_allowed
-    });
-  }
-
+  
   try {
     // 2. Dados pré-definidos com fallback para valores padrão
     const notificationData = {
