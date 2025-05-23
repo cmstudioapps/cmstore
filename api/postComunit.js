@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   // Configuração para GET - Listar publicações
   if (req.method === 'GET') {
     try {
-      const response = await fetch("https://cm-tube-default-rtdb.firebaseio.com/feed/.json");
+      const response = await fetch("https://jogos-a1a46-default-rtdb.firebaseio.com/cm/.json");
       const data = await response.json();
       
       if (!response.ok) {
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       dados.timestamp = new Date().toISOString();
       
       // Salva no Realtime Database
-      const saveResponse = await fetch("https://cm-tube-default-rtdb.firebaseio.com/feed/.json", {
+      const saveResponse = await fetch("https://jogos-a1a46-default-rtdb.firebaseio.com/cm/.json", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados)
