@@ -1,8 +1,6 @@
-// api/teste-notificacao.js
-export default function handler(req, res) {
-  // Mensagens pré-definidas em português
+export default async function handler(req, res) {
   const MENSAGENS = {
-    sucesso: "Notificação simulada enviada com sucesso!",
+    sucesso: "Notificação enviada com sucesso!",
     erro_metodo: "Este endpoint só aceita requisições GET",
     parametros_invalidos: "Parâmetros inválidos na URL",
     exemplos: {
@@ -12,7 +10,6 @@ export default function handler(req, res) {
     }
   };
 
-  // 1. Verifica o método HTTP (aceita apenas GET)
   if (req.method !== 'GET') {
     return res.status(405).json({
       status: "erro",
@@ -21,56 +18,45 @@ export default function handler(req, res) {
     });
   }
 
-  // 2. Simula parâmetros de query
-  const { teste, titulo, mensagem, url } = req.query;
+  const { titulo, mensagem, url } = req.query;
 
-  // 3. Modo de teste simples
-  if (teste === "sim") {
+  if (!titulo || !mensagem) {
+    return res.status(400).json({
+      status: "erro",
+      mensagem: MENSAGENS.parametros_invalidos,
+      campos_obrigatorios: ["titulo", "mensagem"],
+      recebidos: req.query
+    });
+  }
+
+  try {
+    const resposta = await fetch("https://onesignal.com/api/v1/notifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Basic iapxwyb7zuasfu2ievwmaqqcss"
+      },
+      body: JSON.stringify({
+        app_id: "9441361d-4d22-4034-831d-1e2a00ab8dc0",
+        included_segments: ["All"],
+        headings: { pt: titulo },
+        contents: { pt: mensagem },
+        url: url || "https://cmstore.com"
+      })
+    });
+
+    const dados = await resposta.json();
+
     return res.status(200).json({
       status: "sucesso",
       mensagem: MENSAGENS.sucesso,
-      dados_simulados: {
-        titulo: titulo || MENSAGENS.exemplos.titulo,
-        mensagem: mensagem || MENSAGENS.exemplos.mensagem,
-        url: url || MENSAGENS.exemplos.url,
-        segmento: 0,
-        imagem: "",
-        timestamp: new Date().toISOString()
-      },
-      observacao: "Esta é uma simulação - nenhuma notificação real foi enviada"
+      resposta_onesignal: dados
     });
-  }
-
-  // 4. Exemplo de erro
-  if (teste === "erro") {
-    return res.status(400).json({
+  } catch (erro) {
+    return res.status(500).json({
       status: "erro",
-      mensagem: "Erro simulado - Campos obrigatórios faltando",
-      detalhes: {
-        erro_simulado: true,
-        campos_obrigatorios: ["titulo", "mensagem", "url"],
-        parametros_recebidos: req.query
-      }
+      mensagem: "Erro ao enviar notificação",
+      detalhes: erro.message
     });
   }
-
-  // 5. Rota de ajuda/documentação
-  return res.status(200).json({
-    status: "info",
-    mensagem: "Endpoint de teste para notificações PushAlert",
-    como_usar: {
-      metodo: "GET",
-      parametros: {
-        teste: "sim (para sucesso) ou erro (para simular erro)",
-        titulo: "Opcional - Título da notificação",
-        mensagem: "Opcional - Corpo da mensagem",
-        url: "Opcional - URL de destino"
-      },
-      exemplos: {
-        sucesso: "/api/teste-notificacao?teste=sim&titulo=Promoção&mensagem=Confira&url=https...",
-        erro: "/api/teste-notificacao?teste=erro"
-      },
-      mensagens_predefinidas: MENSAGENS.exemplos
-    }
-  });
 }
