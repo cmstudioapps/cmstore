@@ -185,7 +185,7 @@
 
         // Envia a publicação para o endpoint
         function sendPost(postData) {
-            fetch('https://multiversando.vercel.app/api/cm-store', {
+            fetch('https://cm-store.vercel.app/api/postComunit.js', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -214,7 +214,7 @@
 
         // Carrega as publicações existentes
         function loadPosts() {
-            fetch('https://multiversando.vercel.app/api/cm-store')
+            fetch('https://cm-store.vercel.app/api/postComunit.js')
             .then(response => response.json())
             .then(data => {
                 const postsContainer = document.getElementById('postsContainer');
