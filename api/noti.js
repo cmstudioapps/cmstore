@@ -10,48 +10,46 @@ export default async function handler(req, res) {
 
   try {
     // 1. Faz a requisição para a API do PushAlert
-    const response = await fetch("https://pushalert.co/rest/v1/send", {
+    const response = await fetch("https://pushalert.co/api/v1/send", { // 👈 Note a mudança no endpoint
       method: "POST",
       headers: {
-        "Authorization": "60a78f90a87cca4b9908cde4ff1e323d", // 👈 SUA CHAVE AQUI (substitua depois!)
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${process.env.PUSHALERT_API_KEY || '60a78f90a87cca4b9908cde4ff1e323d'}`, // Formato corrigido
+        "Content-Type": "application/json",
+        "Accept": "application/json" // Forçamos resposta JSON
       },
       body: JSON.stringify(notificationData)
     });
 
-    // 2. Verifica se a resposta é JSON ou texto
-    const responseText = await response.text();
+    // 2. Verifica o tipo de conteúdo da resposta
+    const contentType = response.headers.get('content-type');
     
-    try {
-      // Tenta parsear como JSON
-      const jsonResponse = JSON.parse(responseText);
+    if (contentType && contentType.includes('application/json')) {
+      const jsonResponse = await response.json();
       
-      // 3. Retorna sucesso ou erro da API
-      if (jsonResponse.success) {
+      if (response.ok) {
         res.status(200).json({
           status: "success",
           data: jsonResponse
         });
       } else {
-        res.status(400).json({
+        res.status(response.status).json({
           status: "error",
-          message: jsonResponse.message || "Erro desconhecido na API",
+          message: jsonResponse.message || "Erro na API PushAlert",
           details: jsonResponse
         });
       }
+    } else {
+      const textResponse = await response.text();
+      console.error("Resposta inesperada:", textResponse);
       
-    } catch (e) {
-      // Se não for JSON, retorna o texto cru (para debug)
-      console.error("Resposta não-JSON:", responseText);
       res.status(500).json({
         status: "error",
-        message: "Resposta inválida da API",
-        rawResponse: responseText
+        message: "Formato de resposta inesperado da API",
+        rawResponse: textResponse
       });
     }
 
   } catch (err) {
-    // 4. Tratamento de erros de rede/requisição
     console.error("Erro na requisição:", err);
     res.status(500).json({
       status: "error",
