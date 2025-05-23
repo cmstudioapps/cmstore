@@ -34,7 +34,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Basic iapxwyb7zuasfu2ievwmaqqcss"
+        "Authorization": "Basic os_v2_app_sratmhknejadjay5dyvabk4nydupaus6t3ze7yeogi3xutnl6tkhqcmrwxdugfna6gvwcsdox5o4sugnxabty5ufpdeuyc3thx7df3a"
       },
       body: JSON.stringify({
         app_id: "9441361d-4d22-4034-831d-1e2a00ab8dc0",
