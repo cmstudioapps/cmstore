@@ -13,13 +13,19 @@ export default async function handler(req, res) {
     try {
       const response = await fetch("https://jogos-a1a46-default-rtdb.firebaseio.com/cm/.json");
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error("Erro ao buscar publicações");
       }
-      
-      return res.status(200).json(data || {});
-      
+
+      // Converter o objeto de publicações em array ordenado por timestamp
+      const publicacoes = data ? Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) : [];
+
+      return res.status(200).json(publicacoes);
+
     } catch (error) {
       return res.status(500).json({ erro: "Erro ao carregar publicações: " + error.message });
     }
@@ -41,7 +47,7 @@ export default async function handler(req, res) {
     try {
       // Adiciona timestamp à publicação
       dados.timestamp = new Date().toISOString();
-      
+
       // Salva no Realtime Database
       const saveResponse = await fetch("https://jogos-a1a46-default-rtdb.firebaseio.com/cm/.json", {
         method: "POST",
@@ -53,8 +59,8 @@ export default async function handler(req, res) {
         throw new Error("Erro ao salvar publicação");
       }
 
-      // Se tiver texto e imagem, envia notificação
-      if (dados.texto && dados.imagem) {
+      // Se tiver texto, envia notificação (não precisa mais de imagem)
+      if (dados.texto) {
         const textoLimitado = dados.texto.length > 100 
           ? dados.texto.substring(0, 100) + "..." 
           : dados.texto;
@@ -70,7 +76,7 @@ export default async function handler(req, res) {
             included_segments: ["All"],
             headings: { pt: "Nova publicação na CM STORE", en: "New post in CM STORE" },
             contents: { pt: textoLimitado, en: textoLimitado },
-            url: "https://cm-store.vercel.app/index.html"
+            url: "https://cm-store.vercel.app/"
           })
         });
       }
