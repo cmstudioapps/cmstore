@@ -76,7 +76,7 @@ export default async function handler(req, res) {
             included_segments: ["All"],
             headings: { pt: "Nova publicação na CM STORE", en: "New post in CM STORE" },
             contents: { pt: textoLimitado, en: textoLimitado },
-            url: "https://cm-store.vercel.app/"
+            url: "https://cm-store.vercel.app/index.html"
           })
         });
       }
