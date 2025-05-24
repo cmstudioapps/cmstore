@@ -1006,7 +1006,7 @@
             <div class="post-content">${post.texto || ''}</div>
             ${post.imagem ? `<img src="${post.imagem}" class="post-image" alt="Imagem da publicação">` : ''}
             <div class="post-actions">
-              <div class="post-action" onclick="toggleComments('${postId}')"><i class="far fa-comment"></i> Comentar</div>
+              <div style="display:none;" class="post-action" onclick="toggleComments('${postId}')"><i class="far fa-comment"></i> Comentar</div>
               <div class="post-action" onclick="sharePost('${post.nome || 'Usuário'}', '${post.texto || ''}')"><i class="fas fa-share"></i> Compartilhar</div>
             </div>
             
