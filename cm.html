@@ -716,7 +716,7 @@
     <div class="community-container">
       <h1 class="section-title"><i class="fas fa-users"></i> Comunidade CM Store</h1>
 
-      <!-- Profile Section -->
+      
       <div class="profile-section">
         <img id="profilePic" class="profile-pic" src="https://via.placeholder.com/80" alt="Foto de perfil">
         <div class="profile-info">
@@ -733,12 +733,12 @@
         </div>
       </div>
 
-      <!-- Post Form -->
+      
       <div class="post-form">
         <h2 class="post-form-title"><i class="fas fa-edit"></i> Criar Publicação</h2>
         <textarea id="postText" class="post-textarea" placeholder="Compartilhe algo incrível com a comunidade... (mínimo 50 caracteres)"></textarea>
 
-        <!-- Image Preview -->
+        
         <div class="image-preview-container" id="imagePreviewContainer">
           <img id="imagePreview" class="image-preview" alt="Pré-visualização da imagem">
           <button class="remove-image-btn" onclick="removeImage()">
@@ -758,11 +758,11 @@
         <div id="message" class="message"></div>
       </div>
 
-      <!-- Posts Container -->
+      
       <div class="posts-container">
         <h2 class="posts-title"><i class="fas fa-newspaper"></i> Publicações Recentes</h2>
         <div id="postsContainer">
-          <!-- Posts will be loaded here -->
+          
           <div class="no-posts">
             <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
             <p>Carregando publicações...</p>
@@ -1010,7 +1010,7 @@
               <div class="post-action" onclick="sharePost('${post.nome || 'Usuário'}', '${post.texto || ''}')"><i class="fas fa-share"></i> Compartilhar</div>
             </div>
             
-            <!-- Comments Section -->
+            
             <div class="post-comments">
               <div class="comments-toggle" onclick="toggleComments('${postId}')">
                 <i class="fas fa-chevron-right"></i>
