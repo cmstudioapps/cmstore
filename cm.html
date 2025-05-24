@@ -766,8 +766,8 @@
       const submitBtn = document.getElementById('postSubmit');
       
       // Validation
-      if (postText.length < 100) {
-        messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> A publicação precisa ter pelo menos 100 caracteres.`;
+      if (postText.length < 50) {
+        messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> A publicação precisa ter pelo menos 60 caracteres.`;
         messageDiv.className = "message error";
         return;
       }
