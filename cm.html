@@ -418,6 +418,7 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease;
       animation: fadeInUp 0.6s ease-out;
+      cursor: pointer;
     }
 
     .post:hover {
@@ -893,7 +894,7 @@
         imagemPerfil: profilePic,
         nome: userName,
         data: new Date().toISOString(),
-        id: Date.now().toString() // Add unique ID for each post
+        id: Date.now().toString()
       };
 
       try {
@@ -990,6 +991,11 @@
 
           const postElement = document.createElement('div');
           postElement.className = 'post';
+          postElement.setAttribute('data-post-id', postId);
+          postElement.onclick = function() {
+            saveAndRedirectToPost(post);
+          };
+          
           postElement.innerHTML = `
             <div class="post-header">
               ${post.imagemPerfil ? 
@@ -1006,26 +1012,12 @@
             <div class="post-content">${post.texto || ''}</div>
             ${post.imagem ? `<img src="${post.imagem}" class="post-image" alt="Imagem da publicação">` : ''}
             <div class="post-actions">
-              <div style="display:none;" class="post-action" onclick="toggleComments('${postId}')"><i class="far fa-comment"></i> Comentar</div>
-              <div class="post-action" onclick="sharePost('${post.nome || 'Usuário'}', '${post.texto || ''}')"><i class="fas fa-share"></i> Compartilhar</div>
-            </div>
-            
-            <!-- Comments Section -->
-            <div class="post-comments">
-              <div class="comments-toggle" onclick="toggleComments('${postId}')">
-                <i class="fas fa-chevron-right"></i>
-                <span>Comentários</span>
-              </div>
-              <div id="comments-${postId}" class="comments-container">
-                <div id="disqus_thread-${postId}"></div>
-              </div>
+              <div class="post-action"><i class="far fa-comment"></i> Comentar</div>
+              <div class="post-action" onclick="event.stopPropagation(); sharePost('${post.nome || 'Usuário'}', '${post.texto || ''}')"><i class="fas fa-share"></i> Compartilhar</div>
             </div>
           `;
 
           postsContainer.appendChild(postElement);
-
-          // Initialize Disqus for this post
-          initDisqusForPost(postId);
         });
 
         // Add animations to posts
@@ -1044,31 +1036,13 @@
       }
     }
 
-    // Toggle comments visibility
-    function toggleComments(postId) {
-      const commentsContainer = document.getElementById(`comments-${postId}`);
-      const toggleButton = commentsContainer.previousElementSibling;
-
-      commentsContainer.classList.toggle('active');
-      toggleButton.classList.toggle('active');
-
-      if (commentsContainer.classList.contains('active')) {
-        commentsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
-
-    // Initialize Disqus for a specific post
-    function initDisqusForPost(postId) {
-      window.disqus_config = function() {
-        this.page.url = window.location.href + '?post=' + postId;
-        this.page.identifier = 'post-' + postId;
-      };
-
-      const script = document.createElement('script');
-      script.src = 'https://cm-store.disqus.com/embed.js';
-      script.setAttribute('data-timestamp', +new Date());
-      script.setAttribute('data-disqus-identifier', 'post-' + postId);
-      document.getElementById(`disqus_thread-${postId}`).appendChild(script);
+    // Save post and redirect to post page
+    function saveAndRedirectToPost(post) {
+      // Save the post data to localStorage
+      localStorage.setItem('currentPost', JSON.stringify(post));
+      
+      // Redirect to the post page
+      window.location.href = 'post.html';
     }
 
     // Share post
@@ -1135,19 +1109,5 @@
       }
     });
   </script>
-
-<script>
-       var disqus_config = function () {
-           this.page.url = window.location.href;  // URL da página
-           this.page.identifier = 'cm-page'; // Identificador único da página
-       };
-
-       (function() {  // NÃO MODIFIQUE O CÓDIGO ABAIXO
-           var d = document, s = d.createElement('script');
-           s.src = 'https://cm-store.disqus.com/embed.js'; // Shortname do Disqus
-           s.setAttribute('data-timestamp', +new Date());
-           (d.head || d.body).appendChild(s);
-       })();
-   </script>
 </body>
 </html>
