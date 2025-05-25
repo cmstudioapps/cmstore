@@ -1135,5 +1135,19 @@
       }
     });
   </script>
+
+<script>
+       var disqus_config = function () {
+           this.page.url = window.location.href;  // URL da página
+           this.page.identifier = 'cm-page'; // Identificador único da página
+       };
+
+       (function() {  // NÃO MODIFIQUE O CÓDIGO ABAIXO
+           var d = document, s = d.createElement('script');
+           s.src = 'https://cm-store.disqus.com/embed.js'; // Shortname do Disqus
+           s.setAttribute('data-timestamp', +new Date());
+           (d.head || d.body).appendChild(s);
+       })();
+   </script>
 </body>
 </html>
