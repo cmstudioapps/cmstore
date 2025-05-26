@@ -927,7 +927,7 @@
           // Reload posts
           loadPosts();
         } else {
-          throw new Error(data.erro || "Falha ao publicar");
+          throw new Error("Falha ao publicar: "+data.erro);
         }
       } catch (error) {
         messageDiv.innerHTML = `<i class="fas fa-times-circle"></i> Erro: ${error.message}`;
