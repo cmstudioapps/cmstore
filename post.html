@@ -324,7 +324,7 @@
     <div class="menu">
       <a href="index.html">Início</a>
       <a href="categorias.html">Categorias</a>
-      <a href="comunidade.html">Comunidade</a>
+      <a href="cm.html">Comunidade</a>
       <a href="sobre.html">Sobre</a>
     </div>
     <div class="hamburger" onclick="toggleMenu()">
@@ -338,7 +338,7 @@
   </nav>
 
   <main class="main-content">
-    <a href="comunidade.html" class="back-btn">
+    <a href="cm.html" class="back-btn">
       <i class="fas fa-arrow-left"></i> Voltar para Comunidade
     </a>
 
@@ -403,7 +403,7 @@
     // Render post content
     function renderPost(post) {
       const postDate = post.data ? new Date(post.data).toLocaleString() : 'Data desconhecida';
-      
+
       document.getElementById('postContainer').innerHTML = `
         <div class="post-header">
           ${post.imagemPerfil ? 
@@ -443,12 +443,18 @@
 
     // Fetch post from server
     async function fetchPostById(postId) {
-      const response = await fetch(`https://caiolibs.vercel.app/api/gett.js?id=${postId}`);
-      if (!response.ok) {
-        throw new Error("Post não encontrado");
-      }
-      return await response.json();
-    }
+  const response = await fetch(`https://cm-store.vercel.app/api/gett.js?id=${postId}`);
+  if (!response.ok) {
+    throw new Error("Post não encontrado");
+  }
+  const data = await response.json();
+  
+  // Sua API retorna um array, então pegamos o primeiro item
+  if (Array.isArray(data) && data.length > 0) {
+    return data[0]; // Retorna o primeiro post encontrado
+  }
+  throw new Error("Post não encontrado");
+}
 
     // Share post function
     function sharePost(author, text, postId) {
