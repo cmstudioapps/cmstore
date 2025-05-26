@@ -7,7 +7,7 @@ export default function handler(req, res) {
     .then(data => {
       const lista = Object.values(data); // transforma em array
       const post = lista.filter(postagem => postagem.id === id);
-      res.status(200).send(post);
+      res.status(200).json(post);
     })
     .catch(error => {
       console.error(error);
