@@ -1,6 +1,6 @@
 export default function handler(req, res) {
   const { id } = req.query;
-  const Realtime = "https://exemplo.firebaseio.com/posts.json"; // coloque a URL correta aqui
+  const Realtime = "https://jogos-a1a46-default-rtdb.firebaseio.com/cm/.json"; // coloque a URL correta aqui
 
   fetch(Realtime)
     .then(response => response.json())
