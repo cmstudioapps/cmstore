@@ -1,18 +1,16 @@
-/*Tratando requisição get como se fosse um envio de dados*/
-
-
 export default function handler(req, res) {
+  const { id } = req.query;
+  const Realtime = "https://exemplo.firebaseio.com/posts.json"; // coloque a URL correta aqui
 
-const {acao, valor} = req.query
-const userAgent = req.headers['user-agent'];
-if(acao === "salvar") {
-
-res.status(200).send(`Oie ${valor} Beleza?`)
-
-} else {
- 
-res.status(400).json({erro: "Não conseguimos identificar"})
-
-}
-
+  fetch(Realtime)
+    .then(response => response.json())
+    .then(data => {
+      const lista = Object.values(data); // transforma em array
+      const post = lista.filter(postagem => postagem.id === id);
+      res.status(200).send(post);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(400).send("erro");
+    });
 }
