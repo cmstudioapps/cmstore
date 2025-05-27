@@ -931,12 +931,12 @@
           // Reload posts
           loadPosts();
         } else {
-          throw new Error("Falha ao publicar: "+data.erro);
+          throw new Error("Falha ao publicar: "+data.message);
         }
       } catch (error) {
         messageDiv.innerHTML = `<i class="fas fa-times-circle"></i> Erro: ${error.message}`;
         messageDiv.className = "message error";
-        console.error("Erro ao publicar:", error);
+        console.error("Erro ao publicar: "+ error.message);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Publicar`;
