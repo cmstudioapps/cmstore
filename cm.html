@@ -826,7 +826,7 @@
     }
 
     // Set profile name
-    document.getElementById('profileName').textContent = localStorage.getItem("nome") || "Usuário";
+    document.getElementById('profileName').textContent = localStorage.getItem("nome")+" | ID: "+localStorage.getItem("idUser") || "Usuário";
 
     // Profile picture handling
     document.getElementById('profilePicInput').addEventListener('change', function(e) {
