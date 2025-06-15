@@ -29,7 +29,7 @@ localStorage.setItem("ads1",chances)
     },
 {
       title: "Conheça esse canal!",
-      description: "Siga o canal "Sukuna bot Channel Compony,™" no WhatsApp ",
+      description: "Siga o canal Sukuna bot Channel Compony,™ no WhatsApp ",
       image: "https://i.imgur.com/jkN8Qwe.jpeg",
       link: "https://whatsapp.com/channel/0029VbAHUKuBqbr8aYgdrP16",
       expiration: "2025-06-18", // formato YYYY-MM-DD
