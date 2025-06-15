@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         };
       } else if (hora >= 12 && hora < 18) {
         mensagem = {
-          pt: "Hora do almoço e tá sem nada pra fazer? 😴 Dá uma passada na CM STORE e vê esses jogos mara! #FicaADica",
+          pt: "Pô, vem aqui, c sumiu hj<3",
           en: "Lunch time and bored? 😴 Check out CM STORE for awesome games! #JustSaying"
         };
       } else if (hora >= 18 && hora < 23) {
