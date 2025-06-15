@@ -28,13 +28,13 @@ localStorage.setItem("ads1",chances)
       chance: 30
     },
 {
-      title: "VEM JOGAR!",
-      description: "Após um assassinato de uma jovem em um acampamento, o policial Case toma posse do caso e começa a investiga-lo.",
-      image: "https://i.imgur.com/XhFWYOx.jpeg",
-      link: "https://cm-store.vercel.app/game.html?id=com-bleizistudio-thescarytiler",
-      expiration: "2025-06-16", // formato YYYY-MM-DD
+      title: "Conheça esse canal!",
+      description: "Siga o canal "Sukuna bot Channel Compony,™" no WhatsApp ",
+      image: "https://i.imgur.com/jkN8Qwe.jpeg",
+      link: "https://whatsapp.com/channel/0029VbAHUKuBqbr8aYgdrP16",
+      expiration: "2025-06-18", // formato YYYY-MM-DD
       once: false,
-      chance: 35
+      chance: 50
     }
     
   ];
