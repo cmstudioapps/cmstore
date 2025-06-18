@@ -11,14 +11,17 @@ export default function handler(req, res) {
         return res.status(200).end();
     }
 
-    const { acao, encodeURIComponent(nomeJogo), encodeURIComponent(nomeArquivo), valor } = req.query;
+    const { acao, nomeJogo, nomeArquivo, valor } = req.query;
+
+const jogoURL = encodeURIComponent(nomeJogo);
+const arquivoURL = encodeURIComponent(nomeArquivo);
 
     if (!acao || !nomeJogo || !nomeArquivo) {
         return res.status(200).send("Erro: falta informações");
     }
 
     if (acao === "ler" && !valor) {
-        fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`)
+        fetch(`${banco}/${jogoURL}/${arquivoURL}.json`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -33,7 +36,7 @@ export default function handler(req, res) {
     if (acao === "salvar") {
    const content = {valor}
    
-        fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`, {
+        fetch(`${banco}/${jogoURL}/${arquivoURL}.json`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(content)
