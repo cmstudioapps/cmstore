@@ -22,7 +22,7 @@ export default function handler(req, res) {
             .then(response => response.json())
             .then(data => {
                 if (data) {
-                    res.status(200).send(data);
+                    res.status(200).send(data.valor);
                 } else {
                     res.status(200).send("Erro: nada encontrado");
                 }
