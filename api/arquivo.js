@@ -32,7 +32,7 @@ export default function handler(req, res) {
 
     if (acao === "salvar") {
    const content = {valor}
-   JSON.parse(content)
+   
         fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
