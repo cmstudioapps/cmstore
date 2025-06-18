@@ -32,7 +32,7 @@ export default function handler(req, res) {
 
     if (acao === "salvar") {
    
-        fetch(`${banco}/${nomeJogo}/${nomeArquivo}/.json`, {
+        fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(valor)
