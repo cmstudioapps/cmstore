@@ -7,7 +7,7 @@ res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
 
   
-  const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos/";
+  const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
 
   // Pré-flight CORS
   if (req.method === 'OPTIONS') {
@@ -16,9 +16,20 @@ res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
 const { acao, nomeJogo, nomeArquivo, valor } = req.query 
 
-if(!acao || !nomeJogo || !nomeArquivo || !valor) {
+if(!acao || !nomeJogo || !nomeArquivo) {
 
 res.status(200).send("Erro: falta informações")
+
+}
+
+
+if(acao === "ler" && !valor) {
+
+ fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`).then(response => response.json())
+.then(data => {
+res.status(200).send(data)
+
+})
 
 }
 
