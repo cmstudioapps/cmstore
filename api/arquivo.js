@@ -16,7 +16,7 @@ export default function handler(req, res) {
 const jogoURL = encodeURIComponent(nomeJogo);
 const arquivoURL = encodeURIComponent(nomeArquivo);
 
-    if (!acao || !nomeJogo || !nomeArquivo) {
+    if (!acao || !nomeJogo || !nomeArquivo || !id) {
         return res.status(200).send("Erro: falta informações");
     }
 
