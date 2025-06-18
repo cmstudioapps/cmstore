@@ -27,7 +27,11 @@ if(acao === "ler" && !valor) {
 
  fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`).then(response => response.json())
 .then(data => {
+if(data) {
 res.status(200).send(data)
+} else {
+res.status(200).send("erro: nada encontrado")
+}
 
 })
 
