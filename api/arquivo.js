@@ -27,7 +27,7 @@ export default function handler(req, res) {
                     res.status(200).send("Erro: nada encontrado");
                 }
             })
-            .catch(error => res.status(500).send("Erro ao ler dados: " + error.message));
+            .catch(error => res.status(200).send("Erro ao ler dados: " + error.message));
     }
 
     if (acao === "salvar") {
@@ -40,6 +40,6 @@ export default function handler(req, res) {
             .then(data => {
                 res.status(200).send("Salvo com sucesso");
             })
-            .catch(error => res.status(500).send("Erro ao salvar: " + error.message));
+            .catch(error => res.status(200).send("Erro ao salvar: " + error.message));
     }
 }
