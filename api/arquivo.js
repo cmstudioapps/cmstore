@@ -31,11 +31,11 @@ export default function handler(req, res) {
     }
 
     if (acao === "salvar") {
-   
+   const content = {valor}
         fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(valor)
+            body: JSON.stringify(content)
         })
             .then(response => response.json())
             .then(data => {
