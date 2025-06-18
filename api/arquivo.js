@@ -14,6 +14,12 @@ res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.status(200).end();
   }
 
-ArquivoDados = query.body
+const { acao, nomeJogo, nomeArquivo, valor } = req.query 
+
+if(!acao || !nomeJogo || !nomeArquivo || !valor) {
+
+res.status(200).send("Erro: falta informações")
+
+}
 
 }
