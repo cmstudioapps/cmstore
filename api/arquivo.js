@@ -37,4 +37,19 @@ res.status(200).send("erro: nada encontrado")
 
 }
 
+
+if(acao === "salvar") {
+
+fetch(`${banco}/${nomeJogo}/${nomeArquivo}/.json`, ()=> {
+
+method: "PATCH",
+headers: {"Content-Type":"application/json"},
+body: JSON.stringify(valor)
+
+
+
+})
+
+
+}
 }
