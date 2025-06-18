@@ -1,60 +1,45 @@
-export default function handler(req,res) {
-
+export default function handler(req, res) {
     // Permite CORS apenas para o domínio especificado
-res.setHeader('Access-Control-Allow-Origin', '*');
-res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Substitua '*' por um domínio específico.
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
+    const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
 
-  
-  const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
+    // Pré-flight CORS
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
-  // Pré-flight CORS
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+    const { acao, nomeJogo, nomeArquivo, valor } = req.query;
 
-const { acao, nomeJogo, nomeArquivo, valor } = req.query 
+    if (!acao || !nomeJogo || !nomeArquivo) {
+        return res.status(200).send("Erro: falta informações");
+    }
 
-if(!acao || !nomeJogo || !nomeArquivo) {
+    if (acao === "ler" && !valor) {
+        fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    res.status(200).send(data);
+                } else {
+                    res.status(200).send("Erro: nada encontrado");
+                }
+            })
+            .catch(error => res.status(500).send("Erro ao ler dados: " + error.message));
+    }
 
-res.status(200).send("Erro: falta informações")
-
-}
-
-
-if(acao === "ler" && !valor) {
-
- fetch(`${banco}/${nomeJogo}/${nomeArquivo}.json`).then(response => response.json())
-.then(data => {
-if(data) {
-res.status(200).send(data)
-} else {
-res.status(200).send("erro: nada encontrado")
-}
-
-})
-
-}
-
-
-if(acao === "salvar") {
-
-fetch(`${banco}/${nomeJogo}/${nomeArquivo}/.json`, ()=> {
-
-method: "PATCH",
-headers: {"Content-Type":"application/json"},
-body: JSON.stringify(valor)
-
-
-
-}).then(response => response.json())
-.then(data => {
-
-res.status(200).send("Salco com sucesso")
-
-}).catch(error => res.status(200).send("Erro ao salvar: ",error))
-
-
-}
+    if (acao === "salvar") {
+        fetch(`${banco}/${nomeJogo}/${nomeArquivo}/.json`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(valor)
+        })
+            .then(response => response.json())
+            .then(data => {
+                res.status(200).send("Salvo com sucesso");
+            })
+            .catch(error => res.status(500).send("Erro ao salvar: " + error.message));
+    }
 }
