@@ -37,7 +37,7 @@ const arquivoURL = encodeURIComponent(nomeArquivo);
    const content = {valor}
    
         fetch(`${banco}/${jogoURL}/${arquivoURL}.json`, {
-            method: "PATCH",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(content)
         })
