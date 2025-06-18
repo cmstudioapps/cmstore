@@ -48,7 +48,12 @@ body: JSON.stringify(valor)
 
 
 
-})
+}).then(response => response.json())
+.then(data => {
+
+res.status(200).send("Salco com sucesso")
+
+}).catch(error => res.status(200).send("Erro ao salvar: ",error))
 
 
 }
