@@ -7,7 +7,7 @@ res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
 
   
-  const banco = process.env.FIREBASE_URL || "https://jogos-a1a46-default-rtdb.firebaseio.com/Arquivos/";
+  const banco = "https://jogos-a1a46-default-rtdb.firebaseio.com/Arquivos/";
 
   // Pré-flight CORS
   if (req.method === 'OPTIONS') {
