@@ -36,7 +36,7 @@ const arquivoURL = encodeURIComponent(nomeArquivo);
     if (acao === "salvar") {
    const content = {valor}
    
-        fetch(`${banco}/${jogoURL}/${arquivoURL}/${id}.json`, {
+        fetch(`${banco}/${jogoURL}${id}/${arquivoURL}.json`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(content)
