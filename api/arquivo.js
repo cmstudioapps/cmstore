@@ -7,12 +7,13 @@ res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
 
   
-  const banco = "https://jogos-a1a46-default-rtdb.firebaseio.com/Arquivos/";
+  const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos/";
 
   // Pré-flight CORS
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+ArquivoDados = query.body
 
 }
