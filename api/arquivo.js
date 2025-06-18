@@ -11,7 +11,7 @@ export default function handler(req, res) {
         return res.status(200).end();
     }
 
-    const { acao, nomeJogo, nomeArquivo, valor } = req.query;
+    const { acao, nomeJogo, id, nomeArquivo, valor } = req.query;
 
 const jogoURL = encodeURIComponent(nomeJogo);
 const arquivoURL = encodeURIComponent(nomeArquivo);
@@ -21,7 +21,7 @@ const arquivoURL = encodeURIComponent(nomeArquivo);
     }
 
     if (acao === "ler" && !valor) {
-        fetch(`${banco}/${jogoURL}/${arquivoURL}.json`)
+        fetch(`${banco}/${jogoURL}/${arquivoURL}/${id}.json`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -36,7 +36,7 @@ const arquivoURL = encodeURIComponent(nomeArquivo);
     if (acao === "salvar") {
    const content = {valor}
    
-        fetch(`${banco}/${jogoURL}/${arquivoURL}.json`, {
+        fetch(`${banco}/${jogoURL}/${arquivoURL}/${id}.json`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(content)
