@@ -11,7 +11,7 @@ export default function handler(req, res) {
         return res.status(200).end();
     }
 
-    const { acao, nomeJogo, nomeArquivo, valor } = req.query;
+    const { acao, encodeURIComponent(nomeJogo), encodeURIComponent(nomeArquivo), valor } = req.query;
 
     if (!acao || !nomeJogo || !nomeArquivo) {
         return res.status(200).send("Erro: falta informações");
