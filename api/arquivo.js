@@ -7,7 +7,7 @@ export default function handler(req, res) {
 
 const userAgent = req.headers['user-agent'] || '';
 
-
+const origem = req.headers.origin;
 
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
     const TEMPO_LEITURA = 1000; // 1 segundo entre leituras
@@ -93,6 +93,7 @@ const userAgent = req.headers['user-agent'] || '';
                         // Grava os dados
                         const content = {
                             userAgent,
+                            origem,
                             valor: valor,
                             ultimaModificacao: agora
                         };
