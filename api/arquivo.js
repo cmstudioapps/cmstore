@@ -5,6 +5,8 @@ export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
 const origem = req.headers.origin;
+
+return res.status(200).send("Origem: "+origem)
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
     const TEMPO_LEITURA = 1000; // 1 segundo entre leituras
     const TEMPO_ESCRITA = 3000; // 3 segundos entre gravações
@@ -88,7 +90,7 @@ const origem = req.headers.origin;
 
                         // Grava os dados
                         const content = {
-                          origem,
+                          
                             valor: valor,
                             ultimaModificacao: agora
                         };
