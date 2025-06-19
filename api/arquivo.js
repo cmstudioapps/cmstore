@@ -14,7 +14,7 @@ if (!userAgent.includes("Catrobatbot") && !origem.includes("https://cm-store.ver
     
 
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
-    const TEMPO_LEITURA = 2000; // 1 segundo entre leituras
+    const TEMPO_LEITURA = 3000; // 3 segundo entre leituras
     const TEMPO_ESCRITA = 3000; // 3 segundos entre gravações
     const TEMPO_BLOQUEIO_BASE = 10000; // 10 segundos de bloqueio base
 
