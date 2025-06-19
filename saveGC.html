@@ -382,7 +382,223 @@
         
         <div id="results" class="file-explorer"></div>
     </div>
+    <div style="
+    background: #1e1e1e;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border-left: 5px solid #ffcc00;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+">
+    <h3 style="
+        color: #ffcc00;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    ">
+        <i class="fas fa-link"></i> Parâmetros da API
+    </h3>
     
+    <div style="display: grid; gap: 1rem;">
+        <!-- Parâmetro acao -->
+        <div style="
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        ">
+            <div>
+                <div style="font-weight: bold; color: #ffcc00; margin-bottom: 0.3rem;">acao</div>
+                <div style="font-family: 'Roboto Mono', monospace; font-size: 0.9rem; color: #e0e0e0;">
+                    ler | salvar
+                </div>
+            </div>
+            <button onclick="copyToClipboard('acao')" style="
+                background: #ffcc00;
+                color: #000;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-family: 'Roboto Mono', monospace;
+                font-weight: bold;
+                transition: all 0.2s;
+            ">
+                <i class="far fa-copy"></i> Copiar
+            </button>
+        </div>
+        
+        <!-- Parâmetro nomeJogo -->
+        <div style="
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        ">
+            <div>
+                <div style="font-weight: bold; color: #ffcc00; margin-bottom: 0.3rem;">nomeJogo</div>
+                <div style="font-family: 'Roboto Mono', monospace; font-size: 0.9rem; color: #e0e0e0;">
+                    Nome do jogo (sem espaços)
+                </div>
+            </div>
+            <button onclick="copyToClipboard('nomeJogo')" style="
+                background: #ffcc00;
+                color: #000;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-family: 'Roboto Mono', monospace;
+                font-weight: bold;
+                transition: all 0.2s;
+            ">
+                <i class="far fa-copy"></i> Copiar
+            </button>
+        </div>
+        
+        <!-- Parâmetro id -->
+        <div style="
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        ">
+            <div>
+                <div style="font-weight: bold; color: #ffcc00; margin-bottom: 0.3rem;">id</div>
+                <div style="font-family: 'Roboto Mono', monospace; font-size: 0.9rem; color: #e0e0e0;">
+                    ID único do jogador
+                </div>
+            </div>
+            <button onclick="copyToClipboard('id')" style="
+                background: #ffcc00;
+                color: #000;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-family: 'Roboto Mono', monospace;
+                font-weight: bold;
+                transition: all 0.2s;
+            ">
+                <i class="far fa-copy"></i> Copiar
+            </button>
+        </div>
+        
+        <!-- Parâmetro nomeArquivo -->
+        <div style="
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        ">
+            <div>
+                <div style="font-weight: bold; color: #ffcc00; margin-bottom: 0.3rem;">nomeArquivo</div>
+                <div style="font-family: 'Roboto Mono', monospace; font-size: 0.9rem; color: #e0e0e0;">
+                    Nome do arquivo de dados
+                </div>
+            </div>
+            <button onclick="copyToClipboard('nomeArquivo')" style="
+                background: #ffcc00;
+                color: #000;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-family: 'Roboto Mono', monospace;
+                font-weight: bold;
+                transition: all 0.2s;
+            ">
+                <i class="far fa-copy"></i> Copiar
+            </button>
+        </div>
+        
+        <!-- Parâmetro valor -->
+        <div style="
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        ">
+            <div>
+                <div style="font-weight: bold; color: #ffcc00; margin-bottom: 0.3rem;">valor</div>
+                <div style="font-family: 'Roboto Mono', monospace; font-size: 0.9rem; color: #e0e0e0;">
+                    (Opcional) Valor a ser salvo
+                </div>
+            </div>
+            <button onclick="copyToClipboard('valor')" style="
+                background: #ffcc00;
+                color: #000;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-family: 'Roboto Mono', monospace;
+                font-weight: bold;
+                transition: all 0.2s;
+            ">
+                <i class="far fa-copy"></i> Copiar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(param) {
+    let textToCopy = param;
+    if(param === 'acao') textToCopy = 'acao=ler';
+    if(param === 'valor') textToCopy = 'valor=seu_valor_aqui';
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        // Feedback visual
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            if(btn.innerHTML.includes('Copiado!')) {
+                btn.innerHTML = '<i class="far fa-copy"></i> Copiar';
+                btn.style.background = '#ffcc00';
+            }
+        });
+        
+        const clickedBtn = event.target.closest('button');
+        clickedBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+        clickedBtn.style.background = '#00b894';
+        
+        setTimeout(() => {
+            clickedBtn.innerHTML = '<i class="far fa-copy"></i> Copiar';
+            clickedBtn.style.background = '#ffcc00';
+        }, 2000);
+    }).catch(err => {
+        console.error('Erro ao copiar: ', err);
+    });
+}
+</script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const acaoSelect = document.getElementById('acao');
