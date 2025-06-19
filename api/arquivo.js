@@ -4,6 +4,7 @@ export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
+const origem = req.headers.origin;
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
     const TEMPO_LEITURA = 1000; // 1 segundo entre leituras
     const TEMPO_ESCRITA = 3000; // 3 segundos entre gravações
@@ -70,6 +71,7 @@ export default function handler(req, res) {
                             const tempoBloqueio = TEMPO_BLOQUEIO_BASE + (violacoes * 10000); // +10 segundos por violação
                             
                             const blockContent = {
+                               origem,
                                 block: true,
                                 tempo: agora + tempoBloqueio,
                                 violacoes: violacoes + 1
