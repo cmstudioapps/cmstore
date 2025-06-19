@@ -71,7 +71,7 @@ const origem = req.headers.origin;
                             const tempoBloqueio = TEMPO_BLOQUEIO_BASE + (violacoes * 10000); // +10 segundos por violação
                             
                             const blockContent = {
-                               origem,
+                               
                                 block: true,
                                 tempo: agora + tempoBloqueio,
                                 violacoes: violacoes + 1
@@ -88,6 +88,7 @@ const origem = req.headers.origin;
 
                         // Grava os dados
                         const content = {
+                          origem,
                             valor: valor,
                             ultimaModificacao: agora
                         };
