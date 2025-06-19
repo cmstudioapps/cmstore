@@ -4,7 +4,7 @@ export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-const origem = req.headers.origin;
+const origem = req.headers.origin || req.headers.referer || req.headers['x-forwarded-for'] || req.connection.remoteAddress || "origem desconhecida";
 
 return res.status(200).send("Origem: "+origem)
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
