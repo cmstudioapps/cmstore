@@ -407,7 +407,7 @@
             const id = document.getElementById('id').value.trim();
             const nomeArquivo = document.getElementById('nomeArquivo').value.trim();
             const acao = acaoSelect.value;
-            const valor = document.getElementById('valor').value.trim();
+            const valor = document.getElementById('valor')?.value.trim() || '';
             
             // Validação básica
             if (!nomeJogo || !id || !nomeArquivo) {
@@ -425,51 +425,61 @@
             resultsDiv.innerHTML = '';
             
             try {
-                // Construir URL da API
-                let apiUrl = `https://cm-store.vercel.app/api/arquivo.js?acao=${acao}&nomeJogo=${encodeURIComponent(nomeJogo)}&id=${encodeURIComponent(id)}&nomeArquivo=${encodeURIComponent(nomeArquivo)}`;
+                // Construir URL da API com parâmetros de consulta
+                const params = new URLSearchParams();
+                params.append('acao', acao);
+                params.append('nomeJogo', nomeJogo);
+                params.append('id', id);
+                params.append('nomeArquivo', nomeArquivo);
                 
                 if (acao === 'salvar') {
-                    apiUrl += `&valor=${encodeURIComponent(valor)}`;
+                    params.append('valor', valor);
                 }
+                
+                const apiUrl = `https://cm-store.vercel.app/api/arquivo.js?${params.toString()}`;
                 
                 // Fazer requisição com headers personalizados
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
                         'User-Agent': 'Catrobatbot',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    mode: 'cors'
+                        'Content-Type': 'text/plain' // A API retorna texto simples
+                    }
                 });
                 
                 // Verificar status da resposta
                 if (!response.ok) {
-                    const errorData = await response.text();
-                    throw new Error(`Erro ${response.status}: ${errorData || 'Sem detalhes'}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.text();
                 
                 loadingDiv.style.display = 'none';
                 
-                if (data.startsWith('Erro:')) {
+                // Tratar respostas específicas da API
+                if (data.includes('Erro:')) {
                     showStatus(data, 'error');
                 } else if (data === 'Salvo com sucesso') {
                     showStatus(data, 'success');
+                    // Limpar campo de valor após salvar
+                    if (document.getElementById('valor')) {
+                        document.getElementById('valor').value = '';
+                    }
+                } else if (data.includes('jogo bloqueado')) {
+                    showStatus(data, 'warning');
+                } else if (data.includes('Aguarde')) {
+                    showStatus(data, 'warning');
                 } else {
-                    showStatus('Dados carregados com sucesso', 'success');
+                    showStatus('Operação realizada com sucesso', 'success');
                     displayResults(nomeJogo, id, nomeArquivo, data);
                 }
             } catch (error) {
                 loadingDiv.style.display = 'none';
                 
-                if (error.message.includes('Failed to fetch')) {
-                    showStatus('Erro de conexão: Não foi possível acessar a API', 'error');
-                } else if (error.message.includes('500')) {
-                    showStatus('Erro no servidor: A API retornou um erro interno (500)', 'error');
+                if (error.message.includes('500')) {
+                    showStatus('Erro: Permission denied - Verifique se o User-Agent está correto', 'error');
                 } else {
-                    showStatus(`Erro: ${error.message}`, 'error');
+                    showStatus(`Erro ao acessar a API: ${error.message}`, 'error');
                 }
                 
                 console.error('Erro detalhado:', error);
@@ -479,6 +489,8 @@
         function showStatus(message, type) {
             statusDiv.textContent = message;
             statusDiv.className = 'status ' + type;
+            // Rolagem automática para a mensagem
+            statusDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
         function displayResults(nomeJogo, id, nomeArquivo, data) {
@@ -500,7 +512,8 @@
                     const jsonData = JSON.parse(data);
                     content = `<pre>${JSON.stringify(jsonData, null, 2)}</pre>`;
                 } catch (e) {
-                    content = data;
+                    // Se não for JSON, mostrar o texto diretamente
+                    content = data || "Nenhum conteúdo encontrado";
                 }
             }
             
