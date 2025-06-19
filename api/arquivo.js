@@ -4,14 +4,12 @@ export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
+    const userAgent = req.headers['user-agent'] || '';
+    const origem = req.headers.origin || "indefinido";
 
-const userAgent = req.headers['user-agent'] || '';
-
-const origem = req.headers.origin || "indefinido"
-
-if(!userAgent.includes("Catrobatbot")) {
-return res.status(500).send("Permission denied")
-}
+    if(!userAgent.includes("Catrobatbot") && origem !== "https://cm-store.vercel.app") {
+        return res.status(500).send("Permission denied");
+    }
 
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
     const TEMPO_LEITURA = 1000; // 1 segundo entre leituras
@@ -36,7 +34,7 @@ return res.status(500).send("Permission denied")
         .then(response => response.json())
         .then(blockData => {
             const agora = new Date().getTime();
-            
+
             if (blockData && blockData.block === true && agora < blockData.tempo) {
                 return res.status(200).send("Erro: jogo bloqueado por " + Math.round((blockData.tempo - agora)/1000) + " segundos");
             }
@@ -77,20 +75,19 @@ return res.status(500).send("Permission denied")
                             // Calcula o tempo de bloqueio incremental
                             const violacoes = blockData?.violacoes || 0;
                             const tempoBloqueio = TEMPO_BLOQUEIO_BASE + (violacoes * 10000); // +10 segundos por violação
-                            
+
                             const blockContent = {
-                               
                                 block: true,
                                 tempo: agora + tempoBloqueio,
                                 violacoes: violacoes + 1
                             };
-                            
+
                             fetch(`${banco}/${jogoURL}/block.json`, {
                                 method: "PATCH",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify(blockContent)
                             });
-                            
+
                             return res.status(200).send(`Erro: espere 3 segundos entre modificações. Jogo bloqueado por ${tempoBloqueio/1000} segundos`);
                         }
 
