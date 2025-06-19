@@ -7,7 +7,7 @@ export default function handler(req, res) {
     const userAgent = req.headers['user-agent'] || '';
     const origem = req.headers.origin || "indefinido";
 
-    if(!userAgent.includes("Catrobatbot") && origem !== "https://cm-store.vercel.app") {
+    if(!userAgent.includes("Catrobatbot") && origem !== "https://cm-store.vercel.app/saveGC.html") {
         return res.status(500).send("Permission denied");
     }
 
