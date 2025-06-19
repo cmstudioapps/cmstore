@@ -383,126 +383,129 @@
         <div id="results" class="file-explorer"></div>
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const acaoSelect = document.getElementById('acao');
-            const valorGroup = document.getElementById('valorGroup');
-            const submitBtn = document.getElementById('submitBtn');
-            const statusDiv = document.getElementById('status');
-            const loadingDiv = document.getElementById('loading');
-            const resultsDiv = document.getElementById('results');
-            
-            // Mostrar/ocultar campo de valor baseado na ação selecionada
-            acaoSelect.addEventListener('change', function() {
-                if (this.value === 'salvar') {
-                    valorGroup.style.display = 'block';
-                } else {
-                    valorGroup.style.display = 'none';
-                }
-            });
-            
-            // Enviar requisição à API
-            submitBtn.addEventListener('click', function() {
-                const nomeJogo = document.getElementById('nomeJogo').value.trim();
-                const id = document.getElementById('id').value.trim();
-                const nomeArquivo = document.getElementById('nomeArquivo').value.trim();
-                const acao = acaoSelect.value;
-                const valor = document.getElementById('valor').value.trim();
-                
-                // Validação básica
-                if (!nomeJogo || !id || !nomeArquivo) {
-                    showStatus('Preencha todos os campos obrigatórios', 'error');
-                    return;
-                }
-                
-                if (acao === 'salvar' && !valor) {
-                    showStatus('Digite um valor para salvar', 'error');
-                    return;
-                }
-                
-                // Mostrar loading
-                loadingDiv.style.display = 'block';
-                resultsDiv.innerHTML = '';
-                
-                // Construir URL da API
-                let apiUrl = `https://cm-store.vercel.app/api/arquivo.js?acao=${acao}&nomeJogo=${encodeURIComponent(nomeJogo)}&id=${encodeURIComponent(id)}&nomeArquivo=${encodeURIComponent(nomeArquivo)}`;
-                
-                if (acao === 'salvar') {
-                    apiUrl += `&valor=${encodeURIComponent(valor)}`;
-                }
-                
-                // Fazer requisição
-                fetch(apiUrl, {
-                    headers: {
-                        'User-Agent': 'Catrobatbot'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erro na requisição');
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    loadingDiv.style.display = 'none';
-                    
-                    if (data.startsWith('Erro:')) {
-                        showStatus(data, 'error');
-                    } else if (data === 'Salvo com sucesso') {
-                        showStatus(data, 'success');
-                    } else {
-                        showStatus('Dados carregados com sucesso', 'success');
-                        displayResults(nomeJogo, id, nomeArquivo, data);
-                    }
-                })
-                .catch(error => {
-                    loadingDiv.style.display = 'none';
-                    showStatus(`Erro ao acessar a API: ${error.message}`, 'error');
-                    console.error('Erro:', error);
-                });
-            });
-            
-            function showStatus(message, type) {
-                statusDiv.textContent = message;
-                statusDiv.className = 'status ' + type;
-            }
-            
-            function displayResults(nomeJogo, id, nomeArquivo, data) {
-                resultsDiv.innerHTML = '';
-                
-                const fileCard = document.createElement('div');
-                fileCard.className = 'file-card';
-                
-                let icon, content;
-                
-                if (data === 'Salvo com sucesso') {
-                    icon = '<i class="file-icon fas fa-check-circle"></i>';
-                    content = 'Arquivo salvo com sucesso!';
-                } else {
-                    icon = '<i class="file-icon fas fa-file-code"></i>';
-                    
-                    // Tentar formatar JSON se possível
-                    try {
-                        const jsonData = JSON.parse(data);
-                        content = `<pre>${JSON.stringify(jsonData, null, 2)}</pre>`;
-                    } catch (e) {
-                        content = data;
-                    }
-                }
-                
-                fileCard.innerHTML = `
-                    ${icon}
-                    <div class="file-name">${nomeArquivo}</div>
-                    <div class="file-meta">
-                        <small>Jogo: ${nomeJogo}</small><br>
-                        <small>ID: ${id}</small>
-                    </div>
-                    <div class="file-content">${content}</div>
-                `;
-                
-                resultsDiv.appendChild(fileCard);
+    // Substitua a parte do script pelo seguinte código:
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const acaoSelect = document.getElementById('acao');
+        const valorGroup = document.getElementById('valorGroup');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusDiv = document.getElementById('status');
+        const loadingDiv = document.getElementById('loading');
+        const resultsDiv = document.getElementById('results');
+        
+        // Mostrar/ocultar campo de valor baseado na ação selecionada
+        acaoSelect.addEventListener('change', function() {
+            if (this.value === 'salvar') {
+                valorGroup.style.display = 'block';
+            } else {
+                valorGroup.style.display = 'none';
             }
         });
-    </script>
+        
+        // Enviar requisição à API
+        submitBtn.addEventListener('click', function() {
+            const nomeJogo = document.getElementById('nomeJogo').value.trim();
+            const id = document.getElementById('id').value.trim();
+            const nomeArquivo = document.getElementById('nomeArquivo').value.trim();
+            const acao = acaoSelect.value;
+            const valor = document.getElementById('valor').value.trim();
+            
+            // Validação básica
+            if (!nomeJogo || !id || !nomeArquivo) {
+                showStatus('Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+            
+            if (acao === 'salvar' && !valor) {
+                showStatus('Digite um valor para salvar', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            loadingDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+            
+            // Construir URL da API
+            let apiUrl = `https://cm-store.vercel.app/api/arquivo.js?acao=${acao}&nomeJogo=${encodeURIComponent(nomeJogo)}&id=${encodeURIComponent(id)}&nomeArquivo=${encodeURIComponent(nomeArquivo)}`;
+            
+            if (acao === 'salvar') {
+                apiUrl += `&valor=${encodeURIComponent(valor)}`;
+            }
+            
+            // Fazer requisição com headers personalizados
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: new Headers({
+                    'User-Agent': 'Catrobatbot',
+                    'Content-Type': 'application/json'
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                loadingDiv.style.display = 'none';
+                
+                if (data.startsWith('Erro:')) {
+                    showStatus(data, 'error');
+                } else if (data === 'Salvo com sucesso') {
+                    showStatus(data, 'success');
+                } else {
+                    showStatus('Dados carregados com sucesso', 'success');
+                    displayResults(nomeJogo, id, nomeArquivo, data);
+                }
+            })
+            .catch(error => {
+                loadingDiv.style.display = 'none';
+                showStatus(`Erro ao acessar a API: ${error.message}`, 'error');
+                console.error('Erro detalhado:', error);
+            });
+        });
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+        }
+        
+        function displayResults(nomeJogo, id, nomeArquivo, data) {
+            resultsDiv.innerHTML = '';
+            
+            const fileCard = document.createElement('div');
+            fileCard.className = 'file-card';
+            
+            let icon, content;
+            
+            if (data === 'Salvo com sucesso') {
+                icon = '<i class="file-icon fas fa-check-circle"></i>';
+                content = 'Arquivo salvo com sucesso!';
+            } else {
+                icon = '<i class="file-icon fas fa-file-code"></i>';
+                
+                // Tentar formatar JSON se possível
+                try {
+                    const jsonData = JSON.parse(data);
+                    content = `<pre>${JSON.stringify(jsonData, null, 2)}</pre>`;
+                } catch (e) {
+                    content = data;
+                }
+            }
+            
+            fileCard.innerHTML = `
+                ${icon}
+                <div class="file-name">${nomeArquivo}</div>
+                <div class="file-meta">
+                    <small>Jogo: ${nomeJogo}</small><br>
+                    <small>ID: ${id}</small>
+                </div>
+                <div class="file-content">${content}</div>
+            `;
+            
+            resultsDiv.appendChild(fileCard);
+        }
+    });
+</script>
 </body>
 </html>
