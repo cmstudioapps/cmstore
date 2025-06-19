@@ -4,12 +4,14 @@ export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    const userAgent = req.headers['user-agent'] || '';
-    const origem = req.headers.origin || "indefinido";
+    const origem = req.headers.origin || req.headers.referer || "";
+const userAgent = req.headers["user-agent"] || "";
 
-    if(!userAgent.includes("Catrobatbot") && origem !== "https://cm-store.vercel.app/saveGC.html") {
-        return res.status(500).send("Permission denied");
-    }
+if (!userAgent.includes("Catrobatbot") && !origem.includes("https://cm-store.vercel.app")) {
+  return res.status(500).send("Permission denied");
+}
+
+    
 
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
     const TEMPO_LEITURA = 1000; // 1 segundo entre leituras
