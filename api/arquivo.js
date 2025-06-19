@@ -1,10 +1,13 @@
 export default function handler(req, res) {
-    // Configurações de CORS (mantidas iguais)
+    // Configurações de CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     const banco = "https://meu-diario-79efa-default-rtdb.firebaseio.com/arquivos";
+    const TEMPO_LEITURA = 1000; // 1 segundo entre leituras
+    const TEMPO_ESCRITA = 3000; // 3 segundos entre gravações
+    const TEMPO_BLOQUEIO_BASE = 10000; // 10 segundos de bloqueio base
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -23,35 +26,53 @@ export default function handler(req, res) {
     fetch(`${banco}/${jogoURL}/block.json`)
         .then(response => response.json())
         .then(blockData => {
-            if (blockData && blockData.block === true) {
-                const agora = new Date().getTime();
-                if (agora < blockData.tempo) {
-                    return res.status(200).send("Erro: jogo bloqueado por " + Math.round((blockData.tempo - agora)/1000) + " segundos");
-                }
+            const agora = new Date().getTime();
+            
+            if (blockData && blockData.block === true && agora < blockData.tempo) {
+                return res.status(200).send("Erro: jogo bloqueado por " + Math.round((blockData.tempo - agora)/1000) + " segundos");
             }
 
             if (acao === "ler") {
-                fetch(`${banco}/${jogoURL}/${id}/${arquivoURL}.json`)
+                // Verifica intervalo entre leituras
+                fetch(`${banco}/${jogoURL}/${id}/${arquivoURL}/ultimaLeitura.json`)
                     .then(response => response.json())
-                    .then(data => {
-                        res.status(200).send(data?.valor || "Erro: nada encontrado");
-                    })
-                    .catch(error => res.status(200).send("Erro ao ler: " + error.message));
-            } 
-            else if (acao === "salvar") {
+                    .then(ultimaLeitura => {
+                        if (ultimaLeitura && (agora - ultimaLeitura) < TEMPO_LEITURA) {
+                            return res.status(200).send("Aguarde 1 segundo entre leituras");
+                        }
+
+                        // Atualiza tempo da última leitura
+                        fetch(`${banco}/${jogoURL}/${id}/${arquivoURL}/ultimaLeitura.json`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(agora)
+                        });
+
+                        // Faz a leitura dos dados
+                        fetch(`${banco}/${jogoURL}/${id}/${arquivoURL}.json`)
+                            .then(response => response.json())
+                            .then(data => {
+                                res.status(200).send(data?.valor || "Erro: nada encontrado");
+                            })
+                            .catch(error => res.status(200).send("Erro ao ler dados: " + error.message));
+                    });
+
+            } else if (acao === "salvar") {
                 if (!valor) return res.status(200).send("Erro: valor vazio");
-                
-                // Verificação do intervalo de 3 segundos
+
+                // Verifica intervalo entre gravações
                 fetch(`${banco}/${jogoURL}/${id}/${arquivoURL}/ultimaModificacao.json`)
                     .then(response => response.json())
                     .then(ultimaMod => {
-                        const agora = new Date().getTime();
-                        
-                        // Bloqueia se tentar modificar em menos de 3 segundos
-                        if (ultimaMod && (agora - ultimaMod) < 3000) {
+                        if (ultimaMod && (agora - ultimaMod) < TEMPO_ESCRITA) {
+                            // Calcula o tempo de bloqueio incremental
+                            const violacoes = blockData?.violacoes || 0;
+                            const tempoBloqueio = TEMPO_BLOQUEIO_BASE + (violacoes * 10000); // +10 segundos por violação
+                            
                             const blockContent = {
                                 block: true,
-                                tempo: agora + 10000 // Bloqueia por 10 segundos
+                                tempo: agora + tempoBloqueio,
+                                violacoes: violacoes + 1
                             };
                             
                             fetch(`${banco}/${jogoURL}/block.json`, {
@@ -60,10 +81,10 @@ export default function handler(req, res) {
                                 body: JSON.stringify(blockContent)
                             });
                             
-                            return res.status(200).send("Erro: espere 3 segundos entre modificações. Jogo bloqueado por 10 segundos");
+                            return res.status(200).send(`Erro: espere 3 segundos entre modificações. Jogo bloqueado por ${tempoBloqueio/1000} segundos`);
                         }
 
-                        // Se passou a verificação, salva os dados
+                        // Grava os dados
                         const content = {
                             valor: valor,
                             ultimaModificacao: agora
@@ -78,5 +99,6 @@ export default function handler(req, res) {
                         .catch(error => res.status(200).send("Erro ao salvar: " + error.message));
                     });
             }
-        });
+        })
+        .catch(error => res.status(200).send("Erro: " + error.message));
 }
