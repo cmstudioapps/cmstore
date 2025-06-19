@@ -383,8 +383,7 @@
         <div id="results" class="file-explorer"></div>
     </div>
     
-    
-<script>
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
         const acaoSelect = document.getElementById('acao');
         const valorGroup = document.getElementById('valorGroup');
@@ -403,7 +402,7 @@
         });
         
         // Enviar requisição à API
-        submitBtn.addEventListener('click', function() {
+        submitBtn.addEventListener('click', async function() {
             const nomeJogo = document.getElementById('nomeJogo').value.trim();
             const id = document.getElementById('id').value.trim();
             const nomeArquivo = document.getElementById('nomeArquivo').value.trim();
@@ -425,28 +424,33 @@
             loadingDiv.style.display = 'block';
             resultsDiv.innerHTML = '';
             
-            // Construir URL da API
-            let apiUrl = `https://cm-store.vercel.app/api/arquivo.js?acao=${acao}&nomeJogo=${encodeURIComponent(nomeJogo)}&id=${encodeURIComponent(id)}&nomeArquivo=${encodeURIComponent(nomeArquivo)}`;
-            
-            if (acao === 'salvar') {
-                apiUrl += `&valor=${encodeURIComponent(valor)}`;
-            }
-            
-            // Fazer requisição com headers personalizados
-            fetch(apiUrl, {
-                method: 'GET',
-                headers: new Headers({
-                    'User-Agent': 'Catrobatbot',
-                    'Content-Type': 'application/json'
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            try {
+                // Construir URL da API
+                let apiUrl = `https://cm-store.vercel.app/api/arquivo.js?acao=${acao}&nomeJogo=${encodeURIComponent(nomeJogo)}&id=${encodeURIComponent(id)}&nomeArquivo=${encodeURIComponent(nomeArquivo)}`;
+                
+                if (acao === 'salvar') {
+                    apiUrl += `&valor=${encodeURIComponent(valor)}`;
                 }
-                return response.text();
-            })
-            .then(data => {
+                
+                // Fazer requisição com headers personalizados
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': 'Catrobatbot',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                // Verificar status da resposta
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    throw new Error(`Erro ${response.status}: ${errorData || 'Sem detalhes'}`);
+                }
+                
+                const data = await response.text();
+                
                 loadingDiv.style.display = 'none';
                 
                 if (data.startsWith('Erro:')) {
@@ -457,12 +461,19 @@
                     showStatus('Dados carregados com sucesso', 'success');
                     displayResults(nomeJogo, id, nomeArquivo, data);
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 loadingDiv.style.display = 'none';
-                showStatus(`Erro ao acessar a API: ${error.message}`, 'error');
+                
+                if (error.message.includes('Failed to fetch')) {
+                    showStatus('Erro de conexão: Não foi possível acessar a API', 'error');
+                } else if (error.message.includes('500')) {
+                    showStatus('Erro no servidor: A API retornou um erro interno (500)', 'error');
+                } else {
+                    showStatus(`Erro: ${error.message}`, 'error');
+                }
+                
                 console.error('Erro detalhado:', error);
-            });
+            }
         });
         
         function showStatus(message, type) {
