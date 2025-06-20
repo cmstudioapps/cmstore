@@ -606,7 +606,7 @@ function copyToClipboard(param) {
     let textToCopy = param;
     if(param === 'acao') textToCopy = 'acao=ler';
     if(param === 'valor') textToCopy = 'valor=seu_valor_aqui';
-if(param === 'link') textToCopy = 'https://cm-store.vercel.app/api/arquivo.js?;
+if(param === 'link') textToCopy = 'https://cm-store.vercel.app/api/arquivo.js?';
     
     navigator.clipboard.writeText(textToCopy).then(() => {
         // Feedback visual
