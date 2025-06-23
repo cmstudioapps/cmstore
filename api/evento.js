@@ -120,7 +120,7 @@ export default async function handler(req, res) {
         if (!nomeEvento) {
             return res.status(400).send(`Parâmetro obrigatório faltando: nomeEvento`)
             }
-        }
+        
 
         // Consultar evento
         const resposta = await fetch(urlEvento);
@@ -129,7 +129,7 @@ export default async function handler(req, res) {
         if (!dadosEvento) {
             return res.status(404).send(`Evento '${nomeEvento}' não encontrado`);
 }
-        }
+        
 
         // Calcular status em tempo real
         const agora = Date.now();
