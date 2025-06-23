@@ -63,7 +63,7 @@ export default async function handler(req, res) {
         }
 
         const duracao = parseInt(minutos);
-        if (isNaN(duracao) {
+        if (isNaN(duracao)) {
             return res.status(400).json({
                 success: false,
                 message: "O parâmetro 'minutos' deve ser um número válido"
