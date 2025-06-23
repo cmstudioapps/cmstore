@@ -1,4 +1,4 @@
-// api/eventos.js - Endpoint final para gerenciamento de eventos por usuário
+// api/eventos.js
 export default async function handler(req, res) {
     // Configurações de CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -31,39 +31,18 @@ export default async function handler(req, res) {
     }
 
     // URLs do Firebase
-    const basePath = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${nomeJogo}/usuarios/${id}/eventos`;
-    const urlEvento = `${basePath}/${nomeEvento}.json`;
+    const basePath = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${encodeURIComponent(nomeJogo)}/usuarios/${encodeURIComponent(id)}/eventos`;
+    const urlEvento = `${basePath}/${encodeURIComponent(nomeEvento)}.json`;
     const urlTodosEventos = `${basePath}.json`;
 
     try {
         switch (req.method) {
             case 'POST':
-                if (!nomeEvento || !minutos) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Parâmetros obrigatórios faltando: nomeEvento e minutos"
-                    });
-                }
-                return await criarEvento();
-            
+                return await handlePost();
             case 'GET':
-                if (!nomeEvento) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Parâmetro obrigatório faltando: nomeEvento"
-                    });
-                }
-                return await consultarEvento();
-            
+                return await handleGet();
             case 'DELETE':
-                if (!nomeEvento) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Parâmetro obrigatório faltando: nomeEvento"
-                    });
-                }
-                return await removerEvento();
-            
+                return await handleDelete();
             default:
                 return res.status(405).json({
                     success: false,
@@ -78,17 +57,23 @@ export default async function handler(req, res) {
         });
     }
 
-    // Funções auxiliares
-    async function criarEvento() {
+    async function handlePost() {
+        if (!nomeEvento || !minutos) {
+            return res.status(400).json({
+                success: false,
+                message: "Parâmetros obrigatórios faltando: nomeEvento e minutos"
+            });
+        }
+
         const duracao = parseInt(minutos);
-        if (isNaN(duracao) {
+        if (isNaN(duracao)) {
             return res.status(400).json({
                 success: false,
                 message: "Parâmetro 'minutos' deve ser um número válido"
             });
         }
 
-        // Verificar limite de eventos (máximo 5 por usuário)
+        // Verificar limite de eventos
         const eventosResponse = await fetch(urlTodosEventos);
         const eventos = await eventosResponse.json();
         const totalEventos = eventos ? Object.keys(eventos).length : 0;
@@ -103,7 +88,6 @@ export default async function handler(req, res) {
                 });
             }
             
-            // Se todos estiverem inativos, limpa antes de criar
             await fetch(urlTodosEventos, { method: 'DELETE' });
         }
 
@@ -125,26 +109,33 @@ export default async function handler(req, res) {
             body: JSON.stringify(dadosEvento)
         });
 
-        if (!resposta.ok) throw new Error("Falha ao criar evento no Firebase");
+        if (!resposta.ok) throw new Error("Falha ao criar evento");
 
         return res.status(201).json({
             success: true,
-            message: `Evento '${nomeEvento}' criado com sucesso para o usuário ${id}`,
+            message: `Evento criado com sucesso`,
             data: dadosEvento
         });
     }
 
-    async function consultarEvento() {
-        // Controle de frequência (2 horas entre consultas)
+    async function handleGet() {
+        if (!nomeEvento) {
+            return res.status(400).json({
+                success: false,
+                message: "Parâmetro obrigatório faltando: nomeEvento"
+            });
+        }
+
+        // Controle de frequência
         const ultimaConsulta = req.cookies ? req.cookies[`ultimaConsulta_${id}_${nomeEvento}`] : null;
         const agora = Date.now();
-        const intervaloMinimo = 2 * 60 * 60 * 1000; // 2 horas
+        const intervaloMinimo = 2 * 60 * 60 * 1000;
 
         if (ultimaConsulta && (agora - parseInt(ultimaConsulta)) < intervaloMinimo) {
             const minutosRestantes = Math.ceil((intervaloMinimo - (agora - parseInt(ultimaConsulta))) / 60000;
             return res.status(429).json({
                 success: false,
-                message: `Aguarde ${minutosRestantes} minutos para consultar este evento novamente`
+                message: `Aguarde ${minutosRestantes} minutos para consultar novamente`
             });
         }
 
@@ -155,11 +146,11 @@ export default async function handler(req, res) {
         if (!dadosEvento) {
             return res.status(404).json({
                 success: false,
-                message: `Evento '${nomeEvento}' não encontrado para este usuário`
+                message: "Evento não encontrado"
             });
         }
 
-        // Atualizar status se necessário
+        // Atualizar status
         const statusAtual = agora >= dadosEvento.fim ? "off" : "on";
         let atualizado = false;
 
@@ -187,26 +178,32 @@ export default async function handler(req, res) {
         });
     }
 
-    async function removerEvento() {
-        // Verificar se o evento existe
+    async function handleDelete() {
+        if (!nomeEvento) {
+            return res.status(400).json({
+                success: false,
+                message: "Parâmetro obrigatório faltando: nomeEvento"
+            });
+        }
+
+        // Verificar se existe
         const respostaConsulta = await fetch(urlEvento);
         const evento = await respostaConsulta.json();
 
         if (!evento) {
             return res.status(404).json({
                 success: false,
-                message: `Evento '${nomeEvento}' não encontrado`
+                message: "Evento não encontrado"
             });
         }
 
-        // Remover o evento
+        // Remover evento
         const resposta = await fetch(urlEvento, { method: 'DELETE' });
-
         if (!resposta.ok) throw new Error("Falha ao remover evento");
 
         return res.status(200).json({
             success: true,
-            message: `Evento '${nomeEvento}' removido com sucesso`,
+            message: "Evento removido com sucesso",
             data: evento
         });
     }
