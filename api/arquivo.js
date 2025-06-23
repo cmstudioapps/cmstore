@@ -22,7 +22,75 @@ if (!userAgent.includes("Catrobatbot") && !origem.includes("https://cm-store.ver
         return res.status(200).end();
     }
 
-    const { acao, nomeJogo, id, nomeArquivo, valor } = req.query;
+    const { acao, nomeJogo, id, nomeArquivo, valor, evento, nomeEvento , minutos } = req.query;
+
+
+
+
+if (nomeJogo && evento && nomeEvento) {
+  const url = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${nomeJogo}/eventos/${nomeEvento}.json`;
+
+  if (evento === "criar" && minutos) {
+    const agora = Date.now();
+    const duracao = parseInt(minutos) * 60 * 1000;
+    const fim = agora + duracao;
+
+    const eventoData = {
+      criadoEm: agora,
+      minutos: parseInt(minutos),
+      fim: fim,
+      status: "on"
+    };
+
+    return fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(eventoData)
+    })
+    .then(resposta => resposta.json())
+    .then(() => {
+      return res.status(200).send(`Evento ${nomeEvento} criado!`);
+    })
+    .catch(err => {
+      console.error("Erro ao criar evento:", err);
+      return res.status(500).send("Erro ao criar evento.");
+    });
+  }
+
+  if (evento === "ler") {
+    return fetch(url)
+      .then(resposta => resposta.json())
+      .then(eventoData => {
+        if (!eventoData) {
+          return res.status(404).send("Evento não encontrado.");
+        }
+
+        const agora = Date.now();
+        const statusAtual = agora >= eventoData.fim ? "off" : "on";
+
+        if (eventoData.status !== statusAtual) {
+          return fetch(`${url}/status.json`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(statusAtual)
+          })
+          .then(() => {
+            return res.status(200).send(statusAtual);
+          })
+          .catch(err => {
+            console.error("Erro ao atualizar status:", err);
+            return res.status(500).send("Erro ao atualizar status.");
+          });
+        } else {
+          return res.status(200).send(statusAtual);
+        }
+      })
+      .catch(err => {
+        console.error("Erro ao ler evento:", err);
+        return res.status(500).send("Erro ao ler evento.");
+      });
+  }
+}
 
     const jogoURL = encodeURIComponent(nomeJogo);
     const arquivoURL = encodeURIComponent(nomeArquivo);
