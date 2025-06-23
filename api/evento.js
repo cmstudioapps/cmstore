@@ -1,8 +1,8 @@
-// api/eventos.js - Endpoint dedicado para gerenciamento de eventos
-export default function handler(req, res) {
+// api/eventos.js - Endpoint final para gerenciamento de eventos por usuário
+export default async function handler(req, res) {
     // Configurações de CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     // Verificação de segurança
@@ -10,68 +10,113 @@ export default function handler(req, res) {
     const userAgent = req.headers["user-agent"] || "";
 
     if (!userAgent.includes("Catrobatbot") && !origem.includes("https://cm-store.vercel.app")) {
-        return res.status(403).send("Acesso não autorizado");
+        return res.status(403).json({ 
+            success: false,
+            message: "Acesso não autorizado" 
+        });
     }
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
-    const { acao, nomeJogo, nomeEvento, minutos } = req.query;
+    const { nomeJogo, id, nomeEvento, minutos } = req.query;
 
-    // Validação básica
-    if (!nomeJogo || !nomeEvento) {
-        return res.status(400).send("Parâmetros obrigatórios faltando: nomeJogo e nomeEvento");
+    // Validação básica dos parâmetros
+    if (!nomeJogo || !id) {
+        return res.status(400).json({
+            success: false,
+            message: "Parâmetros obrigatórios faltando: nomeJogo e id (do usuário)"
+        });
     }
 
-    const urlEvento = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${nomeJogo}/eventos/${nomeEvento}.json`;
-    const urlTodosEventos = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${nomeJogo}/eventos.json`;
-
-    switch (req.method) {
-        case 'POST':
-            return criarEvento(req, res, urlEvento, urlTodosEventos);
-        case 'GET':
-            return consultarEvento(req, res, urlEvento);
-        default:
-            return res.status(405).send("Método não permitido");
-    }
-}
-
-// Função para criar um novo evento
-async function criarEvento(req, res, urlEvento, urlTodosEventos) {
-    const { minutos } = req.query;
-
-    if (!minutos || isNaN(minutos)) {
-        return res.status(400).send("Parâmetro 'minutos' inválido ou faltando");
-    }
+    // URLs do Firebase
+    const basePath = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${nomeJogo}/usuarios/${id}/eventos`;
+    const urlEvento = `${basePath}/${nomeEvento}.json`;
+    const urlTodosEventos = `${basePath}.json`;
 
     try {
-        // Verificar limite de eventos
-        const respostaEventos = await fetch(urlTodosEventos);
-        const eventos = await respostaEventos.json();
+        switch (req.method) {
+            case 'POST':
+                if (!nomeEvento || !minutos) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Parâmetros obrigatórios faltando: nomeEvento e minutos"
+                    });
+                }
+                return await criarEvento();
+            
+            case 'GET':
+                if (!nomeEvento) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Parâmetro obrigatório faltando: nomeEvento"
+                    });
+                }
+                return await consultarEvento();
+            
+            case 'DELETE':
+                if (!nomeEvento) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Parâmetro obrigatório faltando: nomeEvento"
+                    });
+                }
+                return await removerEvento();
+            
+            default:
+                return res.status(405).json({
+                    success: false,
+                    message: "Método não permitido"
+                });
+        }
+    } catch (erro) {
+        console.error("Erro na API de eventos:", erro);
+        return res.status(500).json({
+            success: false,
+            message: "Erro interno no servidor"
+        });
+    }
+
+    // Funções auxiliares
+    async function criarEvento() {
+        const duracao = parseInt(minutos);
+        if (isNaN(duracao) {
+            return res.status(400).json({
+                success: false,
+                message: "Parâmetro 'minutos' deve ser um número válido"
+            });
+        }
+
+        // Verificar limite de eventos (máximo 5 por usuário)
+        const eventosResponse = await fetch(urlTodosEventos);
+        const eventos = await eventosResponse.json();
         const totalEventos = eventos ? Object.keys(eventos).length : 0;
 
         if (totalEventos >= 5) {
-            const todosFinalizados = eventos ? Object.values(eventos).every(e => e.status === "off") : true;
-            
-            if (!todosFinalizados) {
-                return res.status(429).send("Limite de eventos atingido (5). Finalize os eventos ativos antes de criar novos.");
+            const eventosAtivos = eventos ? Object.values(eventos).filter(e => e.status === "on") : [];
+            if (eventosAtivos.length > 0) {
+                return res.status(429).json({
+                    success: false,
+                    message: "Limite de 5 eventos atingido. Finalize os eventos ativos antes de criar novos.",
+                    eventosAtivos: eventosAtivos.map(e => e.nomeEvento)
+                });
             }
             
-            // Limpa eventos antigos se todos estiverem finalizados
+            // Se todos estiverem inativos, limpa antes de criar
             await fetch(urlTodosEventos, { method: 'DELETE' });
         }
 
-        // Cria o novo evento
+        // Criar novo evento
         const agora = Date.now();
-        const duracaoMs = parseInt(minutos) * 60 * 1000;
-
         const dadosEvento = {
+            nomeEvento,
             criadoEm: agora,
-            minutos: parseInt(minutos),
-            fim: agora + duracaoMs,
+            minutos: duracao,
+            fim: agora + (duracao * 60000),
             status: "on",
-            atualizadoEm: agora
+            atualizadoEm: agora,
+            criadoPor: id
         };
 
         const resposta = await fetch(urlEvento, {
@@ -80,53 +125,43 @@ async function criarEvento(req, res, urlEvento, urlTodosEventos) {
             body: JSON.stringify(dadosEvento)
         });
 
-        if (!resposta.ok) throw new Error("Falha ao criar evento");
+        if (!resposta.ok) throw new Error("Falha ao criar evento no Firebase");
 
         return res.status(201).json({
             success: true,
-            message: `Evento '${req.query.nomeEvento}' criado com sucesso`,
+            message: `Evento '${nomeEvento}' criado com sucesso para o usuário ${id}`,
             data: dadosEvento
         });
-
-    } catch (erro) {
-        console.error("Erro ao criar evento:", erro);
-        return res.status(500).json({
-            success: false,
-            message: "Erro interno ao processar a criação do evento"
-        });
     }
-}
 
-// Função para consultar um evento
-async function consultarEvento(req, res, urlEvento) {
-    try {
-        // Verificar intervalo entre consultas (2 horas)
-        const ultimaConsulta = req.cookies?.ultimaConsultaEvento || 0;
+    async function consultarEvento() {
+        // Controle de frequência (2 horas entre consultas)
+        const ultimaConsulta = req.cookies ? req.cookies[`ultimaConsulta_${id}_${nomeEvento}`] : null;
         const agora = Date.now();
-        const intervaloMinimo = 2 * 60 * 60 * 1000; // 2 horas em milissegundos
+        const intervaloMinimo = 2 * 60 * 60 * 1000; // 2 horas
 
-        if (agora - ultimaConsulta < intervaloMinimo) {
-            const tempoRestante = Math.ceil((intervaloMinimo - (agora - ultimaConsulta)) / 60000);
+        if (ultimaConsulta && (agora - parseInt(ultimaConsulta)) < intervaloMinimo) {
+            const minutosRestantes = Math.ceil((intervaloMinimo - (agora - parseInt(ultimaConsulta))) / 60000;
             return res.status(429).json({
                 success: false,
-                message: `Aguarde ${tempoRestante} minutos para consultar novamente`
+                message: `Aguarde ${minutosRestantes} minutos para consultar este evento novamente`
             });
         }
 
-        // Consultar o evento no Firebase
+        // Consultar evento
         const resposta = await fetch(urlEvento);
         const dadosEvento = await resposta.json();
 
         if (!dadosEvento) {
             return res.status(404).json({
                 success: false,
-                message: "Evento não encontrado"
+                message: `Evento '${nomeEvento}' não encontrado para este usuário`
             });
         }
 
         // Atualizar status se necessário
         const statusAtual = agora >= dadosEvento.fim ? "off" : "on";
-        let statusModificado = false;
+        let atualizado = false;
 
         if (dadosEvento.status !== statusAtual) {
             await fetch(`${urlEvento}/status.json`, {
@@ -134,26 +169,45 @@ async function consultarEvento(req, res, urlEvento) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(statusAtual)
             });
-            statusModificado = true;
+            atualizado = true;
         }
 
-        // Atualizar cookie da última consulta
-        res.setHeader('Set-Cookie', `ultimaConsultaEvento=${agora}; Max-Age=${intervaloMinimo/1000}; Path=/`);
+        // Atualizar cookie
+        res.setHeader('Set-Cookie', 
+            `ultimaConsulta_${id}_${nomeEvento}=${agora}; Max-Age=${intervaloMinimo/1000}; Path=/; SameSite=Lax`);
 
         return res.status(200).json({
             success: true,
             data: {
                 ...dadosEvento,
                 status: statusAtual,
-                statusModificado
+                statusAtualizado: atualizado,
+                tempoRestante: statusAtual === "on" ? dadosEvento.fim - agora : 0
             }
         });
+    }
 
-    } catch (erro) {
-        console.error("Erro ao consultar evento:", erro);
-        return res.status(500).json({
-            success: false,
-            message: "Erro interno ao consultar o evento"
+    async function removerEvento() {
+        // Verificar se o evento existe
+        const respostaConsulta = await fetch(urlEvento);
+        const evento = await respostaConsulta.json();
+
+        if (!evento) {
+            return res.status(404).json({
+                success: false,
+                message: `Evento '${nomeEvento}' não encontrado`
+            });
+        }
+
+        // Remover o evento
+        const resposta = await fetch(urlEvento, { method: 'DELETE' });
+
+        if (!resposta.ok) throw new Error("Falha ao remover evento");
+
+        return res.status(200).json({
+            success: true,
+            message: `Evento '${nomeEvento}' removido com sucesso`,
+            data: evento
         });
     }
 }
