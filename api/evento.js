@@ -117,25 +117,37 @@ export default async function handler(req, res) {
     }
 
     async function lerEvento() {
-        if (!nomeEvento) {
-            return res.status(400).send(`Parâmetro obrigatório faltando: nomeEvento`)
-            }
-        
-
-        // Consultar evento
-        const resposta = await fetch(urlEvento);
-        const dadosEvento = await resposta.json();
-
-        if (!dadosEvento) {
-            return res.status(404).send(`Evento '${nomeEvento}' não encontrado`);
-}
-        
-
-        // Calcular status em tempo real
-        const agora = Date.now();
-        const statusAtual = agora >= dadosEvento.fim ? "off" : "on";
-
-        return res.status(200).send(statusAtual)
-            
+    if (!nomeEvento) {
+        return res.status(400).send(`Parâmetro obrigatório faltando: nomeEvento`);
     }
+
+    // Consultar evento
+    const resposta = await fetch(urlEvento);
+    const dadosEvento = await resposta.json();
+
+    if (!dadosEvento) {
+        return res.status(404).send(`Evento '${nomeEvento}' não encontrado`);
+    }
+
+    // Calcular status em tempo real
+    const agora = Date.now();
+    const statusAtual = agora >= dadosEvento.fim ? "off" : "on";
+
+    // Se o status mudou, atualizar no Firebase
+    if (statusAtual === "off" && dadosEvento.status !== "off") {
+        const dadosAtualizados = {
+            ...dadosEvento,
+            status: "off",
+            atualizadoEm: agora
+        };
+
+        await fetch(urlEvento, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dadosAtualizados)
+        });
+    }
+
+    return res.status(200).send(statusAtual);
+}
 }
