@@ -118,10 +118,8 @@ export default async function handler(req, res) {
 
     async function lerEvento() {
         if (!nomeEvento) {
-            return res.status(400).json({
-                success: false,
-                message: "Parâmetro obrigatório faltando: nomeEvento"
-            });
+            return res.status(400).send(`Parâmetro obrigatório faltando: nomeEvento`)
+            }
         }
 
         // Consultar evento
@@ -129,23 +127,15 @@ export default async function handler(req, res) {
         const dadosEvento = await resposta.json();
 
         if (!dadosEvento) {
-            return res.status(404).json({
-                success: false,
-                message: `Evento '${nomeEvento}' não encontrado`
-            });
+            return res.status(404).send(`Evento '${nomeEvento}' não encontrado`);
+}
         }
 
         // Calcular status em tempo real
         const agora = Date.now();
         const statusAtual = agora >= dadosEvento.fim ? "off" : "on";
 
-        return res.status(200).json({
-            success: true,
-            data: {
-                ...dadosEvento,
-                status: statusAtual,
-                tempoRestante: statusAtual === "on" ? dadosEvento.fim - agora : 0
-            }
-        });
+        return res.status(200).send(statusAtual)
+            
     }
 }
