@@ -2,7 +2,7 @@
 export default async function handler(req, res) {
     // Configurações de CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     // Verificação de segurança
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    const { nomeJogo, id, nomeEvento, minutos } = req.query;
+    const { nomeJogo, id, nomeEvento, minutos, acao } = req.query;
 
     // Validação básica dos parâmetros
     if (!nomeJogo || !id) {
@@ -36,17 +36,15 @@ export default async function handler(req, res) {
     const urlTodosEventos = `${basePath}.json`;
 
     try {
-        switch (req.method) {
-            case 'POST':
-                return await handlePost();
-            case 'GET':
-                return await handleGet();
-            case 'DELETE':
-                return await handleDelete();
+        switch (acao) {
+            case 'criar':
+                return await handleCriar();
+            case 'ler':
+                return await handleLer();
             default:
-                return res.status(405).json({
+                return res.status(400).json({
                     success: false,
-                    message: "Método não permitido"
+                    message: "Parâmetro 'acao' inválido. Use 'criar' ou 'ler'"
                 });
         }
     } catch (erro) {
@@ -57,7 +55,14 @@ export default async function handler(req, res) {
         });
     }
 
-    async function handlePost() {
+    async function handleCriar() {
+        if (req.method !== 'POST') {
+            return res.status(405).json({
+                success: false,
+                message: "Método não permitido para criação. Use POST."
+            });
+        }
+
         if (!nomeEvento || !minutos) {
             return res.status(400).json({
                 success: false,
@@ -73,7 +78,7 @@ export default async function handler(req, res) {
             });
         }
 
-        // Verificar limite de eventos
+        // Verificar limite de eventos (máximo 5 por usuário)
         const eventosResponse = await fetch(urlTodosEventos);
         const eventos = await eventosResponse.json();
         const totalEventos = eventos ? Object.keys(eventos).length : 0;
@@ -88,6 +93,7 @@ export default async function handler(req, res) {
                 });
             }
             
+            // Se todos estiverem inativos, limpa antes de criar
             await fetch(urlTodosEventos, { method: 'DELETE' });
         }
 
@@ -109,33 +115,27 @@ export default async function handler(req, res) {
             body: JSON.stringify(dadosEvento)
         });
 
-        if (!resposta.ok) throw new Error("Falha ao criar evento");
+        if (!resposta.ok) throw new Error("Falha ao criar evento no Firebase");
 
         return res.status(201).json({
             success: true,
-            message: `Evento criado com sucesso`,
+            message: `Evento '${nomeEvento}' criado com sucesso para o usuário ${id}`,
             data: dadosEvento
         });
     }
 
-    async function handleGet() {
+    async function handleLer() {
+        if (req.method !== 'GET') {
+            return res.status(405).json({
+                success: false,
+                message: "Método não permitido para leitura. Use GET."
+            });
+        }
+
         if (!nomeEvento) {
             return res.status(400).json({
                 success: false,
                 message: "Parâmetro obrigatório faltando: nomeEvento"
-            });
-        }
-
-        // Controle de frequência
-        const ultimaConsulta = req.cookies ? req.cookies[`ultimaConsulta_${id}_${nomeEvento}`] : null;
-        const agora = Date.now();
-        const intervaloMinimo = 2 * 60 * 60 * 1000;
-
-        if (ultimaConsulta && (agora - parseInt(ultimaConsulta)) < intervaloMinimo) {
-            const minutosRestantes = Math.ceil((intervaloMinimo - (agora - parseInt(ultimaConsulta))) / 60000);
-            return res.status(429).json({
-                success: false,
-                message: `Aguarde ${minutosRestantes} minutos para consultar novamente`
             });
         }
 
@@ -146,65 +146,21 @@ export default async function handler(req, res) {
         if (!dadosEvento) {
             return res.status(404).json({
                 success: false,
-                message: "Evento não encontrado"
+                message: `Evento '${nomeEvento}' não encontrado para este usuário`
             });
         }
 
-        // Atualizar status
+        // Calcular status atual
+        const agora = Date.now();
         const statusAtual = agora >= dadosEvento.fim ? "off" : "on";
-        let atualizado = false;
-
-        if (dadosEvento.status !== statusAtual) {
-            await fetch(`${urlEvento}/status.json`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(statusAtual)
-            });
-            atualizado = true;
-        }
-
-        // Atualizar cookie
-        res.setHeader('Set-Cookie', 
-            `ultimaConsulta_${id}_${nomeEvento}=${agora}; Max-Age=${intervaloMinimo/1000}; Path=/; SameSite=Lax`);
 
         return res.status(200).json({
             success: true,
             data: {
                 ...dadosEvento,
                 status: statusAtual,
-                statusAtualizado: atualizado,
                 tempoRestante: statusAtual === "on" ? dadosEvento.fim - agora : 0
             }
-        });
-    }
-
-    async function handleDelete() {
-        if (!nomeEvento) {
-            return res.status(400).json({
-                success: false,
-                message: "Parâmetro obrigatório faltando: nomeEvento"
-            });
-        }
-
-        // Verificar se existe
-        const respostaConsulta = await fetch(urlEvento);
-        const evento = await respostaConsulta.json();
-
-        if (!evento) {
-            return res.status(404).json({
-                success: false,
-                message: "Evento não encontrado"
-            });
-        }
-
-        // Remover evento
-        const resposta = await fetch(urlEvento, { method: 'DELETE' });
-        if (!resposta.ok) throw new Error("Falha ao remover evento");
-
-        return res.status(200).json({
-            success: true,
-            message: "Evento removido com sucesso",
-            data: evento
         });
     }
 }
