@@ -132,7 +132,7 @@ export default async function handler(req, res) {
         const intervaloMinimo = 2 * 60 * 60 * 1000;
 
         if (ultimaConsulta && (agora - parseInt(ultimaConsulta)) < intervaloMinimo) {
-            const minutosRestantes = Math.ceil((intervaloMinimo - (agora - parseInt(ultimaConsulta))) / 60000;
+            const minutosRestantes = Math.ceil((intervaloMinimo - (agora - parseInt(ultimaConsulta))) / 60000);
             return res.status(429).json({
                 success: false,
                 message: `Aguarde ${minutosRestantes} minutos para consultar novamente`
