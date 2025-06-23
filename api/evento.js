@@ -1,23 +1,21 @@
 // api/eventos.js
 export default async function handler(req, res) {
-    // Configurações de CORS
+    // Configurações de CORS para GET
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Verificação de segurança
-    const origem = req.headers.origin || req.headers.referer || "";
-    const userAgent = req.headers["user-agent"] || "";
-
-    if (!userAgent.includes("Catrobatbot") && !origem.includes("https://cm-store.vercel.app")) {
-        return res.status(403).json({ 
-            success: false,
-            message: "Acesso não autorizado" 
-        });
-    }
-
+    // Verificação de segurança básica
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
+    }
+
+    // Aceita apenas método GET
+    if (req.method !== 'GET') {
+        return res.status(405).json({
+            success: false,
+            message: "Método não permitido. Esta API aceita apenas GET."
+        });
     }
 
     const { nomeJogo, id, nomeEvento, minutos, acao } = req.query;
@@ -36,15 +34,16 @@ export default async function handler(req, res) {
     const urlTodosEventos = `${basePath}.json`;
 
     try {
+        // Operação baseada no parâmetro acao
         switch (acao) {
             case 'criar':
-                return await handleCriar();
+                return await criarEvento();
             case 'ler':
-                return await handleLer();
+                return await lerEvento();
             default:
                 return res.status(400).json({
                     success: false,
-                    message: "Parâmetro 'acao' inválido. Use 'criar' ou 'ler'"
+                    message: "Parâmetro 'acao' inválido ou faltando. Use 'criar' ou 'ler'"
                 });
         }
     } catch (erro) {
@@ -55,26 +54,19 @@ export default async function handler(req, res) {
         });
     }
 
-    async function handleCriar() {
-        if (req.method !== 'POST') {
-            return res.status(405).json({
-                success: false,
-                message: "Método não permitido para criação. Use POST."
-            });
-        }
-
+    async function criarEvento() {
         if (!nomeEvento || !minutos) {
             return res.status(400).json({
                 success: false,
-                message: "Parâmetros obrigatórios faltando: nomeEvento e minutos"
+                message: "Para criar um evento são necessários: nomeEvento e minutos"
             });
         }
 
         const duracao = parseInt(minutos);
-        if (isNaN(duracao)) {
+        if (isNaN(duracao) {
             return res.status(400).json({
                 success: false,
-                message: "Parâmetro 'minutos' deve ser um número válido"
+                message: "O parâmetro 'minutos' deve ser um número válido"
             });
         }
 
@@ -117,21 +109,14 @@ export default async function handler(req, res) {
 
         if (!resposta.ok) throw new Error("Falha ao criar evento no Firebase");
 
-        return res.status(201).json({
+        return res.status(200).json({
             success: true,
-            message: `Evento '${nomeEvento}' criado com sucesso para o usuário ${id}`,
+            message: `Evento '${nomeEvento}' criado com sucesso`,
             data: dadosEvento
         });
     }
 
-    async function handleLer() {
-        if (req.method !== 'GET') {
-            return res.status(405).json({
-                success: false,
-                message: "Método não permitido para leitura. Use GET."
-            });
-        }
-
+    async function lerEvento() {
         if (!nomeEvento) {
             return res.status(400).json({
                 success: false,
@@ -146,11 +131,11 @@ export default async function handler(req, res) {
         if (!dadosEvento) {
             return res.status(404).json({
                 success: false,
-                message: `Evento '${nomeEvento}' não encontrado para este usuário`
+                message: `Evento '${nomeEvento}' não encontrado`
             });
         }
 
-        // Calcular status atual
+        // Calcular status em tempo real
         const agora = Date.now();
         const statusAtual = agora >= dadosEvento.fim ? "off" : "on";
 
