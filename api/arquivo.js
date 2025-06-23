@@ -22,42 +22,56 @@ if (!userAgent.includes("Catrobatbot") && !origem.includes("https://cm-store.ver
         return res.status(200).end();
     }
 
-    const { acao, nomeJogo, id, nomeArquivo, valor, evento, nomeEvento , minutos } = req.query;
-
-
-
+    const { acao, nomeJogo, id, nomeArquivo, valor, evento, nomeEvento, minutos } = req.query;
 
 if (nomeJogo && evento && nomeEvento) {
   const url = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${nomeJogo}/eventos/${nomeEvento}.json`;
+  const eventosUrl = `https://meu-diario-79efa-default-rtdb.firebaseio.com/${nomeJogo}/eventos.json`;
 
   if (evento === "criar" && minutos) {
-    const agora = Date.now();
-    const duracao = parseInt(minutos) * 60 * 1000;
-    const fim = agora + duracao;
-
-    const eventoData = {
-      criadoEm: agora,
-      minutos: parseInt(minutos),
-      fim: fim,
-      status: "on"
-    };
-
-    return fetch(url, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(eventoData)
-    })
-    .then(resposta => resposta.json())
-    .then(() => {
-      return res.status(200).send(`Evento ${nomeEvento} criado!`);
-    })
-    .catch(err => {
-      console.error("Erro ao criar evento:", err);
-      return res.status(500).send("Erro ao criar evento.");
-    });
+    // Verificar limite de eventos
+    return fetch(eventosUrl)
+      .then(resposta => resposta.json())
+      .then(eventos => {
+        const eventosExistentes = eventos ? Object.keys(eventos).length : 0;
+        
+        if (eventosExistentes >= 5) {
+          // Verificar se todos estão off
+          const todosOff = Object.values(eventos).every(e => e.status === "off");
+          
+          if (todosOff) {
+            // Limpar todos os eventos
+            return fetch(eventosUrl, {
+              method: "DELETE"
+            })
+            .then(() => criarNovoEvento(url, minutos))
+            .catch(err => {
+              console.error("Erro ao limpar eventos:", err);
+              return res.status(500).send("Erro ao limpar eventos.");
+            });
+          } else {
+            return res.status(429).send("Limite de 5 eventos atingido. Aguarde alguns eventos terminarem.");
+          }
+        } else {
+          return criarNovoEvento(url, minutos);
+        }
+      })
+      .catch(err => {
+        console.error("Erro ao verificar eventos:", err);
+        return res.status(500).send("Erro ao verificar eventos.");
+      });
   }
 
   if (evento === "ler") {
+    const agora = Date.now();
+    const ultimaLeitura = req.cookies?.ultimaLeituraEvento || 0;
+    const tempoDesdeUltimaLeitura = agora - ultimaLeitura;
+    const duasHorasEmMs = 2 * 60 * 60 * 1000;
+
+    if (tempoDesdeUltimaLeitura < duasHorasEmMs) {
+      return res.status(429).send(`Aguarde ${Math.ceil((duasHorasEmMs - tempoDesdeUltimaLeitura)/60000)} minutos para ler novamente.`);
+    }
+
     return fetch(url)
       .then(resposta => resposta.json())
       .then(eventoData => {
@@ -65,7 +79,6 @@ if (nomeJogo && evento && nomeEvento) {
           return res.status(404).send("Evento não encontrado.");
         }
 
-        const agora = Date.now();
         const statusAtual = agora >= eventoData.fim ? "off" : "on";
 
         if (eventoData.status !== statusAtual) {
@@ -75,6 +88,7 @@ if (nomeJogo && evento && nomeEvento) {
             body: JSON.stringify(statusAtual)
           })
           .then(() => {
+            res.cookie('ultimaLeituraEvento', agora, { maxAge: duasHorasEmMs });
             return res.status(200).send(statusAtual);
           })
           .catch(err => {
@@ -82,6 +96,7 @@ if (nomeJogo && evento && nomeEvento) {
             return res.status(500).send("Erro ao atualizar status.");
           });
         } else {
+          res.cookie('ultimaLeituraEvento', agora, { maxAge: duasHorasEmMs });
           return res.status(200).send(statusAtual);
         }
       })
@@ -90,6 +105,34 @@ if (nomeJogo && evento && nomeEvento) {
         return res.status(500).send("Erro ao ler evento.");
       });
   }
+}
+
+// Função auxiliar para criar novo evento
+function criarNovoEvento(url, minutos) {
+  const agora = Date.now();
+  const duracao = parseInt(minutos) * 60 * 1000;
+  const fim = agora + duracao;
+
+  const eventoData = {
+    criadoEm: agora,
+    minutos: parseInt(minutos),
+    fim: fim,
+    status: "on"
+  };
+
+  return fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventoData)
+  })
+  .then(resposta => resposta.json())
+  .then(() => {
+    return res.status(200).send(`Evento criado com sucesso!`);
+  })
+  .catch(err => {
+    console.error("Erro ao criar evento:", err);
+    return res.status(500).send("Erro ao criar evento.");
+  });
 }
 
     const jogoURL = encodeURIComponent(nomeJogo);
