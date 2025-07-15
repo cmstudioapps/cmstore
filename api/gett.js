@@ -11,12 +11,12 @@ export default function handler(req, res) {
 
 
   const { id } = req.query;
-  const Realtime = "https://jogos-a1a46-default-rtdb.firebaseio.com/cm/.json"; // coloque a URL correta aqui
-
+  const Realtime = "https://jogos-a1a46-default-rtdb.firebaseio.com/cm/.json"; 
   fetch(Realtime)
     .then(response => response.json())
     .then(data => {
-      const lista = Object.values(data); // transforma em array
+      const lista = Object.values(data); 
+
       const post = lista.filter(postagem => postagem.id === id);
       res.status(200).json(post);
     })
