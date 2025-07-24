@@ -4,11 +4,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
+  <title>feio por Adriano</title>
+    <style>
+      
+      body {
+        
+        margin: 0;
+        
+        display: flex;
+        
+        justify-content: center;
+        
+        background-color: yellow;
+        
+      }
+      
+      .container {
+        
+        text-align: center;
+        
+        margin-top: 100px;
+        
+        animation: descer 0.7s ease-out forwards;
+        
+        opacity: 0;
+        
+      }
+      
+      @keyframes descer {
+        
+        from {
+          
+          transform: translateY(-50px);
+          
+          opacity: 0;
+          
+        }
+        
+        to {
+          
+          transform: translateY(0);
+          
+          opacity: 1;
+          
+        }
+        
+      }
+      
+     select {
+       
+       padding: 10px;
+       
+       border: 2px solid black;
+       
+       border-radius: 8px;
+       
+       background-color: yellow;
+       
+       color: #333;
+       
+       font-size: 16px;
+       
+     }
+     
+    button {
+      
+      background-color: yellow;
+      
+      color: black;
+      
+      border: 2px solid black;
+      
+      padding: 12px 20px;
+      
+      border-radius: 10px;
+      
+      font-size: 16px;
+      
+      cursor: pointer;
+      
+      transition: transform 0.1s ease;
+      
+    }
+    
+   button:active {
+     
+     transform: scale(o.95);
+     
+   }
+      
+    </style>
 </head>
 
 <body>
-<h3>Trocar Modo</h3>
+  
+  <div class="container">
+    
+    <h3>Trocar Modo</h3>
   <select id="modo">
     <option selected value="0">Selecione um abaixo:</option>
     <option value="1">modo desenvolvedor</option>
@@ -19,6 +111,8 @@
 <button onclick="localStorage.clear(); alert('LocalStorage apagado!');">
   Apagar LocalStorage
 </button>
+
+</div>
   <script>
     
     let modo = document.getElementById("modo")
@@ -29,8 +123,6 @@
       
       
     })
-    
-    
     
   </script>
 </body>
