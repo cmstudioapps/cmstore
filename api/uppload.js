@@ -26,7 +26,7 @@ res.setHeader('Access-Control-Allow-Credentials', 'true'); // Opcional, se usar 
       return res.status(400).json({ error: 'Dados incompletos. Package ID e dados do jogo são obrigatórios.' });
     }
 
-    if (gameData.link && !gameData.link.includes('mediafire.com' || "mega.nz)) {
+    if (gameData.link && !gameData.link.includes('mediafire.com' || "mega.nz")) {
       return res.status(400).json({ error: ' oi fofo,Apenas links do MediaFire  ou mega são aceitos para download' });
     }
 
