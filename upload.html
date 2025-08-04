@@ -820,7 +820,7 @@ async function enviarJogo() {
     return;
   }
 
-  if (!isAnuncio && !link.includes('mediafire.com')) {
+  if (!isAnuncio && !link.includes('mediafire.com' || "mega")) {
     showAlert('O link deve ser do MediaFire!', 'error');
     return;
   }
